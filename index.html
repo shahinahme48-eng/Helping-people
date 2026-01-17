@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nearby Helper - Portal & Admin Control</title>
+    <title>Nearby Helper - Final Fix</title>
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
@@ -39,12 +39,12 @@
         .helper-img { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; background: #334155; border: 1px solid var(--accent); }
         .view-btn {background: var(--accent); color: white; padding: 8px 15px; border-radius: 8px; text-decoration: none; font-size: 14px;}
         
-        /* Admin/Portal Forms */
+        /* Forms */
         .admin-form { padding: 20px; background: var(--header-bg); margin: 16px; border-radius: 15px; border: 1px solid var(--accent); }
         .admin-form input, .admin-form select, .admin-form textarea { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: none; background: var(--card-bg); color: white; outline: none;}
         .save-btn { width: 100%; padding: 12px; background: var(--accent); border: none; color: white; border-radius: 8px; font-weight: bold; cursor: pointer; }
         
-        .manage-item { background: #1e293b; padding: 12px; border-radius: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid var(--accent); }
+        .manage-item { background: #1e293b; padding: 12px; border-radius: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
         .manage-actions { display: flex; gap: 8px; }
         .edit-btn { background: #3b82f6; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 12px; }
         .delete-btn { background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 12px; }
@@ -75,8 +75,8 @@
     </div>
 
     <div class="contact-admin">
-        <p>তথ্য সংশোধনের জন্য অ্যাডমিনের সাথে যোগাযোগ করুন</p>
-        <a href="https://t.me/personaapps" target="_blank" class="tg-btn">Contact Admin</a>
+        <p>যেকোনো সমস্যা বা তথ্য সংশোধনের জন্য অ্যাডমিনের সাথে যোগাযোগ করুন</p>
+        <a href="https://t.me/personaapps" target="_blank" class="tg-btn">Telegram Admin</a>
     </div>
 </div>
 
@@ -86,15 +86,15 @@
     <div id="helpersList"></div>
 </div>
 
-<!-- Helper Registration Portal (Open for All) -->
+<!-- Portal (Open Registration) -->
 <div id="portalSection" class="section">
     <div class="header"><h2>Helper Portal</h2><span>সবাই এখান থেকে প্রোফাইল খুলতে পারবেন</span></div>
     <div class="admin-form">
-        <h4 style="margin-bottom:10px; color:var(--accent);">Create New Profile</h4>
-        <input type="text" id="regName" placeholder="Full Name">
-        <input type="number" id="regPhone" placeholder="Mobile Number">
-        <input type="text" id="regDist" placeholder="Distance (e.g. 1.1 km)">
-        <textarea id="regDesc" placeholder="Work Bio / Description..."></textarea>
+        <h4 style="margin-bottom:10px; color:var(--accent);">নতুন প্রোফাইল তৈরি করুন</h4>
+        <input type="text" id="regName" placeholder="নাম">
+        <input type="number" id="regPhone" placeholder="মোবাইল নম্বর">
+        <input type="text" id="regDist" placeholder="দূরত্ব (যেমন ১.২ কিমি)">
+        <textarea id="regDesc" placeholder="আপনার কাজের বা চেম্বারের বিবরণ..."></textarea>
         <p style="font-size:11px; color:grey; margin-bottom:5px;">Select Photo:</p>
         <input type="file" id="regPhotoFile" accept="image/*">
         <select id="regCat">
@@ -109,16 +109,16 @@
     </div>
 </div>
 
-<!-- Admin Control Section (Password Protected) -->
+<!-- Admin Section (Password: 2919868) -->
 <div id="adminSection" class="section">
-    <div class="header"><h2>Admin Control</h2><span>Profile Management</span></div>
+    <div class="header"><h2>Admin Control</h2><span>ম্যানেজমেন্ট সেকশন</span></div>
     <div class="admin-form">
         <h4 style="margin-bottom:15px; color:var(--accent);">Manage All Profiles</h4>
-        <div id="adminManageList">Loading...</div>
+        <div id="adminManageList">Data Loading...</div>
     </div>
 </div>
 
-<!-- Navigation Bar -->
+<!-- Navbar -->
 <div class="nav">
     <div class="nav-item active" onclick="location.reload()">Home</div>
     <div class="nav-item" onclick="showSection('portalSection')">Portal</div>
@@ -142,9 +142,8 @@
 
     let currentEditKey = null;
 
-    // পাসওয়ার্ড দিয়ে এডমিন সেকশনে ঢোকা
     function accessAdmin() {
-        let pass = prompt("Enter Admin Password:");
+        let pass = prompt("অ্যাডমিন পাসওয়ার্ড দিন:");
         if(pass === "2919868") { 
             showSection('adminSection');
             loadAdminManageList();
@@ -159,7 +158,6 @@
         document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
     }
 
-    // ডাটা সেভ করা (পোর্টালে সবার জন্য)
     document.getElementById('saveBtn').onclick = function() {
         const name = document.getElementById('regName').value;
         const phone = document.getElementById('regPhone').value;
@@ -168,7 +166,7 @@
         const cat = document.getElementById('regCat').value;
         const dist = document.getElementById('regDist').value;
 
-        if(!name || !phone || !desc) { alert("সব ঘর পূরণ করুন!"); return; }
+        if(!name || !phone || !desc) { alert("সব তথ্য পূরণ করুন!"); return; }
 
         const saveData = (photoData) => {
             let dataObj = { name, phone, description: desc, category: cat, distance: dist };
@@ -176,11 +174,11 @@
 
             if(currentEditKey) {
                 database.ref('helpers/' + currentEditKey).update(dataObj).then(() => {
-                    alert("Updated!");
+                    alert("Update Successful!");
                     location.reload();
                 });
             } else {
-                if(!photoData) { alert("ছবি দিন!"); return; }
+                if(!photoData) { alert("ছবি সিলেক্ট করুন!"); return; }
                 database.ref('helpers/').push(dataObj).then(() => {
                     alert("Profile Saved!");
                     location.reload();
@@ -197,7 +195,6 @@
         }
     };
 
-    // এডমিনদের জন্য ম্যানেজ লিস্ট
     function loadAdminManageList() {
         database.ref('helpers/').on('value', (snap) => {
             const listDiv = document.getElementById('adminManageList');
@@ -220,7 +217,7 @@
     }
 
     function deleteHelper(key) {
-        if(confirm("Delete this profile forever?")) {
+        if(confirm("প্রোফাইলটি ডিলিট করতে চান?")) {
             database.ref('helpers/' + key).remove();
         }
     }
@@ -229,14 +226,14 @@
         currentEditKey = key;
         database.ref('helpers/' + key).once('value', snap => {
             const h = snap.val();
-            showSection('portalSection'); // এডিট করার জন্য পোর্টালে নিয়ে যাওয়া
+            showSection('portalSection');
             document.getElementById('regName').value = h.name;
             document.getElementById('regPhone').value = h.phone;
             document.getElementById('regDist').value = h.distance;
             document.getElementById('regDesc').value = h.description;
             document.getElementById('regCat').value = h.category;
-            document.querySelector('#portalSection h4').innerText = "Edit Helper Profile";
-            document.getElementById('saveBtn').innerText = "Update Profile Now";
+            document.querySelector('#portalSection h4').innerText = "Update Helper Profile";
+            document.getElementById('saveBtn').innerText = "Save Changes";
         });
     }
 
@@ -244,7 +241,7 @@
         showSection('helpersSection');
         document.getElementById('helpersTitle').innerText = category;
         const list = document.getElementById('helpersList');
-        list.innerHTML = 'Loading Global Data...';
+        list.innerHTML = 'Data Fetching...';
 
         database.ref('helpers/').once('value', (snapshot) => {
             list.innerHTML = '';
