@@ -22,48 +22,43 @@ body{background:#0f172a;color:white;min-height:100vh;}
 .nav-item{font-size:13px;opacity:.7;cursor:pointer;}
 .nav-item.active{opacity:1;color:#22c55e;}
 @media(max-width:500px){.grid{grid-template-columns:1fr;}}
+.section{display:none;}
 </style>
 </head>
 <body>
 
-<!-- Home Page -->
-<div id="homePage">
+<!-- Home Section -->
+<div id="homeSection" class="section" style="display:block;">
 <div class="header">
   <h2>Nearby Helper</h2>
   <span>Find help around you</span>
-  <input type="text" id="searchInputHome" placeholder="Search helpers...">
+  <input type="text" id="searchHome" placeholder="Search helpers...">
 </div>
 
 <div class="section-title">Emergency</div>
 <div class="grid" id="emergencyGridHome">
-  <div class="card emergency" onclick="openCategory('Plumber Emergency')"><div class="icon">🚿</div><h4>Plumber Emergency</h4></div>
-  <div class="card emergency" onclick="openCategory('Electrician Emergency')"><div class="icon">🧑‍🔧</div><h4>Electrician Emergency</h4></div>
-  <div class="card emergency" onclick="openCategory('Medical Emergency')"><div class="icon">🚑</div><h4>Ambulance / Doctor</h4></div>
+  <div class="card emergency" onclick="openHelpers('Plumber Emergency')"><div class="icon">🚿</div><h4>Plumber Emergency</h4></div>
+  <div class="card emergency" onclick="openHelpers('Electrician Emergency')"><div class="icon">🧑‍🔧</div><h4>Electrician Emergency</h4></div>
+  <div class="card emergency" onclick="openHelpers('Medical Emergency')"><div class="icon">🚑</div><h4>Ambulance / Doctor</h4></div>
 </div>
 
 <div class="section-title">Normal</div>
 <div class="grid" id="normalGridHome">
-  <div class="card" onclick="openCategory('Electrician')"><div class="icon">🧑‍🔧</div><h4>Electrician</h4></div>
-  <div class="card" onclick="openCategory('Medical')"><div class="icon">🚑</div><h4>Medical Help</h4></div>
-  <div class="card" onclick="openCategory('Car')"><div class="icon">🚗</div><h4>Car Help</h4></div>
-  <div class="card" onclick="openCategory('Delivery')"><div class="icon">📦</div><h4>Delivery</h4></div>
-  <div class="card" onclick="openCategory('Plumber')"><div class="icon">🚿</div><h4>Plumber</h4></div>
-  <div class="card" onclick="openCategory('Others')"><div class="icon">➕</div><h4>Others</h4></div>
-</div>
-
-<div class="nav">
-  <div class="nav-item" data-link="#homePage">Home</div>
-  <div class="nav-item" data-link="#profilePage">Profile</div>
-  <div class="nav-item" data-link="#chatsPage">Chats</div>
+  <div class="card" onclick="openHelpers('Electrician')"><div class="icon">🧑‍🔧</div><h4>Electrician</h4></div>
+  <div class="card" onclick="openHelpers('Medical')"><div class="icon">🚑</div><h4>Medical Help</h4></div>
+  <div class="card" onclick="openHelpers('Car')"><div class="icon">🚗</div><h4>Car Help</h4></div>
+  <div class="card" onclick="openHelpers('Delivery')"><div class="icon">📦</div><h4>Delivery</h4></div>
+  <div class="card" onclick="openHelpers('Plumber')"><div class="icon">🚿</div><h4>Plumber</h4></div>
+  <div class="card" onclick="openHelpers('Others')"><div class="icon">➕</div><h4>Others</h4></div>
 </div>
 </div>
 
-<!-- Helpers Page -->
-<div id="helpersPage" style="display:none;">
+<!-- Helpers Section -->
+<div id="helpersSection" class="section">
 <div class="header">
-  <h2 id="pageTitle">Helpers</h2>
-  <span id="pageSubtitle">Find helpers around you</span>
-  <input type="text" id="searchInputHelpers" placeholder="Search helpers...">
+  <h2 id="helpersTitle">Helpers</h2>
+  <span id="helpersSubtitle">List of available helpers</span>
+  <input type="text" id="searchHelpers" placeholder="Search helpers...">
 </div>
 
 <div class="section-title">Emergency</div>
@@ -71,22 +66,17 @@ body{background:#0f172a;color:white;min-height:100vh;}
 
 <div class="section-title">Normal</div>
 <div class="grid" id="normalGridHelpers"></div>
-
-<div class="nav">
-  <div class="nav-item" data-link="#homePage">Home</div>
-  <div class="nav-item" data-link="#profilePage">Profile</div>
-  <div class="nav-item" data-link="#chatsPage">Chats</div>
 </div>
+
+<!-- Bottom Nav -->
+<div class="nav">
+  <div class="nav-item" data-link="#homeSection">Home</div>
+  <div class="nav-item" data-link="#profileSection">Profile</div>
+  <div class="nav-item" data-link="#chatsSection">Chats</div>
 </div>
 
 <script>
-// Function to go to helpers page
-function openCategory(cat){
-  window.location.href = "#helpersPage";
-  loadHelpers(cat);
-}
-
-// Data for helpers
+// Sample helpers data
 const helpersData = {
   'Plumber Emergency': [{name:'Joe', distance:'2 km'}],
   'Electrician Emergency': [{name:'Ali', distance:'1 km'}],
@@ -99,58 +89,76 @@ const helpersData = {
   'Others':[ {name:'Tutor', distance:'1 km'}, {name:'Painter', distance:'3 km'} ]
 };
 
-// Render helpers
-function renderHelpers(gridId,data,emergency=false){
-  const grid=document.getElementById(gridId);
-  grid.innerHTML='';
-  data.forEach(helper=>{
-    const div=document.createElement('div');
-    div.className='card'+(emergency?' emergency':'');
-    div.innerHTML=`<h4>${helper.name} (${helper.distance})</h4>`;
-    div.onclick=()=>alert('Open helper detail: '+helper.name);
-    grid.appendChild(div);
+// Function to open Helpers Section
+function openHelpers(category){
+  document.getElementById('homeSection').style.display='none';
+  document.getElementById('helpersSection').style.display='block';
+  renderHelpers(category);
+}
+
+// Render helpers dynamically
+function renderHelpers(category){
+  const emergencyCats=['Plumber Emergency','Electrician Emergency','Medical Emergency'];
+  const normalCats=['Electrician','Medical','Car','Delivery','Plumber','Others'];
+
+  // Emergency grid
+  const eGrid=document.getElementById('emergencyGridHelpers');
+  eGrid.innerHTML='';
+  emergencyCats.forEach(cat=>{
+    if(helpersData[cat]){
+      helpersData[cat].forEach(helper=>{
+        const div=document.createElement('div');
+        div.className='card emergency';
+        div.innerHTML=`<h4>${helper.name} (${helper.distance})</h4>`;
+        div.onclick=()=>alert('Helper detail: '+helper.name);
+        eGrid.appendChild(div);
+      });
+    }
+  });
+
+  // Normal grid
+  const nGrid=document.getElementById('normalGridHelpers');
+  nGrid.innerHTML='';
+  normalCats.forEach(cat=>{
+    if(helpersData[cat]){
+      helpersData[cat].forEach(helper=>{
+        const div=document.createElement('div');
+        div.className='card';
+        div.innerHTML=`<h4>${helper.name} (${helper.distance})</h4>`;
+        div.onclick=()=>alert('Helper detail: '+helper.name);
+        nGrid.appendChild(div);
+      });
+    }
   });
 }
 
-function loadHelpers(cat){
-  ['Plumber Emergency','Electrician Emergency','Medical Emergency'].forEach(c=>{
-    if(helpersData[c]) renderHelpers('emergencyGridHelpers',helpersData[c],true);
-  });
-  ['Electrician','Medical','Car','Delivery','Plumber','Others'].forEach(c=>{
-    if(helpersData[c]) renderHelpers('normalGridHelpers',helpersData[c],false);
-  });
-}
-
-// Search filter for home
-document.getElementById('searchInputHome').addEventListener('input',function(){
+// Search in Home
+document.getElementById('searchHome').addEventListener('input',function(){
   const val=this.value.toLowerCase();
   [...document.querySelectorAll('#emergencyGridHome .card'),...document.querySelectorAll('#normalGridHome .card')].forEach(card=>{
-    const txt=card.innerText.toLowerCase();
-    card.style.display=txt.includes(val)?'block':'none';
+    card.style.display=card.innerText.toLowerCase().includes(val)?'block':'none';
   });
 });
 
-// Search filter for helpers
-document.getElementById('searchInputHelpers').addEventListener('input',function(){
+// Search in Helpers
+document.getElementById('searchHelpers').addEventListener('input',function(){
   const val=this.value.toLowerCase();
   [...document.querySelectorAll('#emergencyGridHelpers .card'),...document.querySelectorAll('#normalGridHelpers .card')].forEach(card=>{
-    const txt=card.innerText.toLowerCase();
-    card.style.display=txt.includes(val)?'block':'none';
+    card.style.display=card.innerText.toLowerCase().includes(val)?'block':'none';
   });
 });
 
-// Nav active
+// Bottom nav
 const navItems=document.querySelectorAll('.nav-item');
 navItems.forEach(item=>{
   item.addEventListener('click',()=>{
+    document.querySelectorAll('.section').forEach(s=>s.style.display='none');
     const target=document.querySelector(item.dataset.link);
-    document.querySelectorAll('#homePage,#helpersPage').forEach(p=>p.style.display='none');
-    target.style.display='block';
+    if(target) target.style.display='block';
     navItems.forEach(i=>i.classList.remove('active'));
     item.classList.add('active');
   });
 });
 </script>
-
 </body>
 </html>
