@@ -3,34 +3,51 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Nearby Helper – Home</title>
+<title>Nearby Helper – Global Sync</title>
+
+<!-- Firebase SDK (Version 8 - Easy for HTML) -->
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
 <style>
   *{margin:0;padding:0;box-sizing:border-box;font-family: 'Poppins', sans-serif;}
   :root { --bg: #0f172a; --header-bg: #020617; --card-bg: #1e293b; --accent: #22c55e; --emergency: #ef4444; }
-  body{background: var(--bg); color:white; min-height:100vh; padding-bottom: 70px;}
+  body{background: var(--bg); color:white; min-height:100vh; padding-bottom: 80px;}
+  
   .header{background: var(--header-bg); padding:20px; position: sticky; top:0; z-index: 100;}
   .header h2{font-size:22px; color: var(--accent);}
   .header input{margin-top:15px; width:100%; padding:12px; border:none; border-radius:12px; background: var(--card-bg); color:white; font-size:14px; outline: none; border: 1px solid #334155;}
+  
   .section-title{margin:20px 16px 10px; font-weight:600; font-size:18px; color: var(--accent);}
   .grid{display:grid; grid-template-columns:repeat(2,1fr); gap:14px; padding:0 16px;}
   .card{background: var(--header-bg); border-radius:16px; padding:20px; text-align:center; cursor:pointer; border: 1px solid #1e293b; transition: 0.3s;}
   .card.emergency{border: 1px solid var(--emergency); background: #2d1313;}
   .card .icon{font-size:35px; margin-bottom:10px; display: block;}
+  
   .helper-list-item { background: var(--header-bg); margin: 10px 16px; padding: 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #1e293b;}
+  .helper-info { display: flex; align-items: center; gap: 12px; }
+  .helper-img { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; background: #334155; }
   .view-btn {background: var(--accent); color: white; padding: 8px 15px; border-radius: 8px; text-decoration: none; font-size: 14px;}
+  
+  .admin-form { padding: 20px; background: var(--header-bg); margin: 16px; border-radius: 15px; border: 1px solid var(--accent); }
+  .admin-form input, .admin-form select { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: none; background: var(--card-bg); color: white; outline: none;}
+  .save-btn { width: 100%; padding: 12px; background: var(--accent); border: none; color: white; border-radius: 8px; font-weight: bold; cursor: pointer; }
+
   .nav{position:fixed; bottom:0; left:0; width:100%; background: var(--header-bg); display:flex; justify-content:space-around; padding:15px 0; border-top:1px solid #1e293b;}
   .nav-item{font-size:14px; opacity:.6; cursor:pointer; color: white; text-decoration: none;}
   .nav-item.active{opacity:1; color: var(--accent);}
+  
   .section{display:none;}
   .show{display:block;}
 </style>
 </head>
 <body>
 
+<!-- Home Section -->
 <div id="homeSection" class="section show">
   <div class="header">
     <h2>Nearby Helper</h2>
-    <input type="text" id="searchHome" placeholder="Search for help...">
+    <input type="text" id="searchHome" placeholder="Search services...">
   </div>
   <div class="section-title">Emergency Services</div>
   <div class="grid">
@@ -46,49 +63,122 @@
   </div>
 </div>
 
+<!-- List of Helpers -->
 <div id="helpersSection" class="section">
   <div class="header">
-    <div onclick="location.reload()" style="cursor:pointer; color:#94a3b8; margin-bottom:10px;">← Back to Home</div>
+    <div onclick="location.reload()" style="cursor:pointer; color:#94a3b8; margin-bottom:10px;">← Back</div>
     <h2 id="helpersTitle">Helpers</h2>
   </div>
   <div id="helpersList"></div>
 </div>
 
+<!-- Helper Registration Portal -->
+<div id="adminSection" class="section">
+  <div class="header"><h2>Helper Portal</h2><span>Add your profile to global list</span></div>
+  <div class="admin-form">
+    <input type="text" id="regName" placeholder="Helper Full Name">
+    <input type="text" id="regPhoto" placeholder="Photo URL (Image Link)">
+    <input type="text" id="regDist" placeholder="Distance (e.g. 1.5 km)">
+    <select id="regCat">
+      <option value="Plumber">Plumber</option>
+      <option value="Medical">Medical / Doctor</option>
+      <option value="Electrician">Electrician</option>
+      <option value="Car">Car Repair</option>
+      <option value="Delivery">Delivery</option>
+      <option value="Others">Others</option>
+    </select>
+    <label style="display:block; margin: 10px 0;"><input type="checkbox" id="regEmerg"> Mark as Emergency?</label>
+    <button class="save-btn" id="saveBtn">Save & Go Live</button>
+    <button onclick="location.reload()" style="background:none; color:grey; border:none; margin-top:15px; width:100%;">Cancel</button>
+  </div>
+</div>
+
 <div class="nav">
   <a href="index.html" class="nav-item active">Home</a>
   <a href="profile.html?page=chats" class="nav-item">Chats</a>
-  <a href="profile.html?page=profile" class="nav-item">Profile</a>
+  <a href="#" class="nav-item" onclick="accessAdmin()">Helper Portal</a>
 </div>
 
 <script>
-const helpersData = [
-  {name:'Rahim Plumber', category:'Plumber', distance:'1.2 km', isEmergency: true},
-  {name:'Ali Electrician', category:'Electrician', distance:'0.8 km', isEmergency: false},
-  {name:'Dr. Ayesha', category:'Medical', distance:'2.5 km', isEmergency: true},
-  {name:'Karim Garage', category:'Car', distance:'3.1 km', isEmergency: false}
-];
-  {name:'Rahim Plumber', category:'Plumber', distance:'1.2 km', isEmergency: true},
-  {name:'Ali Electrician', category:'Electrician', distance:'0.8 km', isEmergency: false},
-  {name:'Dr. Ayesha', category:'Medical', distance:'2.5 km', isEmergency: true},
-  {name:'Karim Garage', category:'Car', distance:'3.1 km', isEmergency: false}
-];
+// --- ফায়ারবেস কনফিগারেশন (আপনার দেওয়া কনফিগ) ---
+const firebaseConfig = {
+  apiKey: "AIzaSyCmOWTieB2TsG4caLergqTlfRYCB1_2WMM",
+  authDomain: "ff-online-gaming-apps.firebaseapp.com",
+  databaseURL: "https://ff-online-gaming-apps-default-rtdb.firebaseio.com",
+  projectId: "ff-online-gaming-apps",
+  storageBucket: "ff-online-gaming-apps.firebasestorage.app",
+  messagingSenderId: "768845729474",
+  appId: "1:768845729474:web:244992645acef124b3b55b"
+};
 
+// ইনিশিয়ালাইজ
+firebase.initializeApp(firebaseConfig);
+const database = firebase.database();
+
+// ১. পাসওয়ার্ড দিয়ে পোর্টালে ঢোকা
+function accessAdmin() {
+    let pass = prompt("এন্টার পাসওয়ার্ড (ডিফল্ট: 2919868):");
+    if(pass === "2919868") { 
+        document.querySelectorAll('.section').forEach(s=>s.classList.remove('show'));
+        document.getElementById('adminSection').classList.add('show');
+    } else {
+        alert("ভুল পাসওয়ার্ড!");
+    }
+}
+
+// ২. ডাটাবেসে সেভ করা
+document.getElementById('saveBtn').onclick = function() {
+    const name = document.getElementById('regName').value;
+    const photo = document.getElementById('regPhoto').value;
+    const dist = document.getElementById('regDist').value;
+    const cat = document.getElementById('regCat').value;
+    const emerg = document.getElementById('regEmerg').checked;
+
+    if(name === "") { alert("নাম দিন!"); return; }
+
+    database.ref('helpers/').push({
+        name: name,
+        photo: photo,
+        distance: dist,
+        category: cat,
+        isEmergency: emerg
+    }).then(() => {
+        alert("আপনার প্রোফাইল সফলভাবে সবার জন্য সেভ হয়েছে!");
+        location.reload();
+    }).catch(err => alert("Error: " + err.message));
+};
+
+// ৩. ডাটাবেস থেকে রিড করা
 function openHelpers(category, isEmerg = false){
   document.getElementById('homeSection').classList.remove('show');
   document.getElementById('helpersSection').classList.add('show');
   document.getElementById('helpersTitle').innerText = category + " Services";
+  
   const list = document.getElementById('helpersList');
-  list.innerHTML = '';
-  const filtered = helpersData.filter(h => h.category === category);
-  if(filtered.length === 0) {
-      list.innerHTML = '<p style="text-align:center; margin-top:30px; opacity:0.5;">No helpers found.</p>';
-  }
-  filtered.forEach(h => {
-    const div = document.createElement('div');
-    div.className = 'helper-list-item';
-    div.innerHTML = `<div><h4>${h.name}</h4><small>${h.distance} away</small></div>
-      <a href="helperDetail.html?name=${h.name}&distance=${h.distance}&emergency=${isEmerg}" class="view-btn">View</a>`;
-    list.appendChild(div);
+  list.innerHTML = '<p style="text-align:center; padding:20px; opacity:0.6;">Loading global data...</p>';
+
+  database.ref('helpers/').once('value', (snapshot) => {
+    list.innerHTML = '';
+    let found = false;
+    snapshot.forEach((childSnapshot) => {
+        const h = childSnapshot.val();
+        if(h.category === category) {
+            found = true;
+            const div = document.createElement('div');
+            div.className = 'helper-list-item';
+            div.innerHTML = `
+                <div class="helper-info">
+                    <img src="${h.photo || 'https://via.placeholder.com/50'}" class="helper-img">
+                    <div>
+                        <h4>${h.name}</h4>
+                        <small>${h.distance} away</small>
+                    </div>
+                </div>
+                <a href="helperDetail.html?name=${h.name}&distance=${h.distance}&emergency=${h.isEmergency}" class="view-btn">View</a>`;
+            list.appendChild(div);
+        }
+    });
+    if(!found) list.innerHTML = '<p style="text-align:center; margin-top:30px; opacity:0.5;">No data available in this category.</p>';
   });
 }
 </script>
