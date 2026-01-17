@@ -3,99 +3,122 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Nearby Helper – With Description</title>
+<title>Nearby Helper – Global Sync</title>
+
+<!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
 <style>
   *{margin:0;padding:0;box-sizing:border-box;font-family: 'Poppins', sans-serif;}
   :root { --bg: #0f172a; --header-bg: #020617; --card-bg: #1e293b; --accent: #22c55e; --emergency: #ef4444; }
-  body{background: var(--bg); color:white; min-height:100vh; padding-bottom: 80px;}
+  
+  body{background: var(--bg); color:white; min-height:100vh; padding-bottom: 80px; overflow-x: hidden;}
+  
   .header{background: var(--header-bg); padding:20px; position: sticky; top:0; z-index: 100;}
-  .header h2{font-size:22px; color: var(--accent);}
-  .section-title{margin:20px 16px 8px; font-weight:600; font-size:18px; color: var(--accent);}
+  .header h2{font-size:24px; color: var(--accent);}
+  
+  .section-title{margin:20px 16px 10px; font-weight:600; font-size:18px; color: var(--accent);}
+  
+  /* Grid Layout */
   .grid{display:grid; grid-template-columns:repeat(2,1fr); gap:14px; padding:0 16px;}
-  .card{background: var(--header-bg); border-radius:16px; padding:20px; text-align:center; cursor:pointer; border: 1px solid #1e293b;}
-  .card.emergency{border: 1px solid var(--emergency); background: #2d1313;}
-  .card .icon{font-size:35px; margin-bottom:10px; display: block;}
-  .helper-list-item { background: var(--header-bg); margin: 10px 16px; padding: 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #1e293b;}
+  .card{background: var(--card-bg); border-radius:20px; padding:25px 10px; text-align:center; cursor:pointer; border: 1px solid #334155; transition: 0.3s;}
+  .card:active{transform: scale(0.95);}
+  .card.emergency{border: 1px solid var(--emergency); background: rgba(239, 68, 68, 0.1);}
+  .card .icon{font-size:40px; margin-bottom:10px; display: block;}
+  .card h4{font-size:16px; font-weight: 500;}
+
+  /* Helper List Style */
+  .helper-list-item { background: var(--header-bg); margin: 10px 16px; padding: 15px; border-radius: 16px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #1e293b;}
   .helper-info { display: flex; align-items: center; gap: 12px; }
   .helper-img { width: 55px; height: 55px; border-radius: 50%; object-fit: cover; background: #334155; border: 2px solid var(--accent); }
-  .view-btn {background: var(--accent); color: white; padding: 8px 18px; border-radius: 8px; text-decoration: none; font-size: 14px; font-weight: 600;}
-  
-  /* রেজিস্ট্রেশন ফরম */
-  .admin-form { padding: 20px; background: var(--header-bg); margin: 16px; border-radius: 15px; border: 1px solid var(--accent); }
-  .admin-form input, .admin-form select, .admin-form textarea { width: 100%; padding: 12px; margin-bottom: 12px; border-radius: 8px; border: none; background: var(--card-bg); color: white; outline: none; font-size: 14px;}
-  .admin-form textarea { height: 100px; resize: none; }
-  .save-btn { width: 100%; padding: 14px; background: var(--accent); border: none; color: white; border-radius: 8px; font-weight: bold; cursor: pointer; }
+  .view-btn {background: var(--accent); color: white; padding: 8px 18px; border-radius: 10px; text-decoration: none; font-size: 14px; font-weight: 600;}
 
-  .nav{position:fixed; bottom:0; left:0; width:100%; background: var(--header-bg); display:flex; justify-content:space-around; padding:15px 0; border-top:1px solid #1e293b; z-index: 100;}
-  .nav-item{font-size:14px; opacity:.6; cursor:pointer; color: white; text-decoration: none;}
-  .nav-item.active{opacity:1; color: var(--accent);}
+  /* Registration Form */
+  .admin-form { padding: 20px; background: var(--header-bg); margin: 16px; border-radius: 20px; border: 1px solid var(--accent); }
+  .admin-form input, .admin-form select, .admin-form textarea { width: 100%; padding: 12px; margin-bottom: 12px; border-radius: 10px; border: none; background: var(--card-bg); color: white; outline: none; font-size: 14px;}
+  .admin-form textarea { height: 100px; resize: none; }
+  .save-btn { width: 100%; padding: 14px; background: var(--accent); border: none; color: white; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 16px;}
+
+  /* Bottom Navigation */
+  .nav{position:fixed; bottom:0; left:0; width:100%; background: var(--header-bg); display:flex; justify-content:space-around; padding:12px 0; border-top:1px solid #1e293b; z-index: 1000;}
+  .nav-item{font-size:14px; opacity:.6; cursor:pointer; color: white; text-decoration: none; text-align: center; flex: 1;}
+  .nav-item.active{opacity:1; color: var(--accent); font-weight: bold;}
+  
   .section{display:none;}
   .show{display:block;}
 </style>
 </head>
 <body>
 
+<!-- Home Section -->
 <div id="homeSection" class="section show">
   <div class="header"><h2>Nearby Helper</h2></div>
+  
   <div class="section-title">Emergency Services</div>
   <div class="grid">
     <div class="card emergency" onclick="openHelpers('Plumber', true)"><span class="icon">🚿</span><h4>Plumber</h4></div>
-    <div class="card emergency" onclick="openHelpers('Medical', true)"><span class="icon">🚑</span><h4>Doctor</h4></div>
+    <div class="card emergency" onclick="openHelpers('Doctor', true)"><span class="icon">🚑</span><h4>Doctor</h4></div>
   </div>
+  
   <div class="section-title">Regular Services</div>
   <div class="grid">
     <div class="card" onclick="openHelpers('Electrician')"><span class="icon">🧑‍🔧</span><h4>Electrician</h4></div>
-    <div class="card" onclick="openHelpers('Car')"><span class="icon">🚗</span><h4>Car Help</h4></div>
+    <div class="card" onclick="openHelpers('Car Help')"><span class="icon">🚗</span><h4>Car Help</h4></div>
     <div class="card" onclick="openHelpers('Delivery')"><span class="icon">📦</span><h4>Delivery</h4></div>
     <div class="card" onclick="openHelpers('Others')"><span class="icon">➕</span><h4>Others</h4></div>
   </div>
 </div>
 
+<!-- Helpers List Section -->
 <div id="helpersSection" class="section">
   <div class="header">
-    <div onclick="location.reload()" style="cursor:pointer; color:#94a3b8; font-size:14px;">← Back</div>
-    <h2 id="helpersTitle" style="margin-top:5px;">Helpers</h2>
+    <div onclick="location.reload()" style="cursor:pointer; color:#94a3b8; font-size: 14px; margin-bottom: 5px;">← Back to Home</div>
+    <h2 id="helpersTitle">Helpers</h2>
   </div>
   <div id="helpersList"></div>
 </div>
 
-<!-- রেজিস্ট্রেশন পোর্টাল -->
+<!-- Admin Portal Section -->
 <div id="adminSection" class="section">
   <div class="header"><h2>Helper Registration</h2></div>
   <div class="admin-form">
-    <input type="text" id="regName" placeholder="Full Name (নাম)">
-    <input type="number" id="regPhone" placeholder="Phone Number (মোবাইল নম্বর)">
-    <input type="text" id="regDist" placeholder="Distance (দূরত্ব - যেমন ১.২ কিমি)">
+    <input type="text" id="regName" placeholder="Full Name">
+    <input type="number" id="regPhone" placeholder="Mobile Number (e.g. 017...)">
+    <input type="text" id="regDist" placeholder="Distance (e.g. 1.2 km)">
     
-    <p style="font-size:12px; color:var(--accent); margin-bottom:5px;">Work Description (কাজের বা নিজের বিবরণ):</p>
-    <textarea id="regDesc" placeholder="আপনার কাজের অভিজ্ঞতা বা দক্ষতা সম্পর্কে বিস্তারিত লিখুন..."></textarea>
+    <textarea id="regDesc" placeholder="Work description or Doctor bio..."></textarea>
     
-    <p style="font-size:12px; color:grey; margin-bottom:5px;">Select Profile Picture:</p>
-    <input type="file" id="regPhotoFile" accept="image/*">
+    <p style="font-size:12px; color:grey; margin-bottom:5px;">Upload Profile Photo:</p>
+    <input type="file" id="regPhotoFile" accept="image/*" style="background: none; padding: 0;">
     
     <select id="regCat">
       <option value="Plumber">Plumber</option>
-      <option value="Medical">Doctor / Medical</option>
+      <option value="Doctor">Doctor</option>
       <option value="Electrician">Electrician</option>
-      <option value="Car">Car Repair</option>
+      <option value="Car Help">Car Help</option>
       <option value="Delivery">Delivery</option>
       <option value="Others">Others</option>
     </select>
     
-    <label style="display:block; margin-bottom:15px; font-size:14px;"><input type="checkbox" id="regEmerg"> Emergency Service?</label>
-    <button class="save-btn" id="saveBtn">Save Profile</button>
+    <label style="display:flex; align-items:center; gap:8px; margin-bottom:15px; font-size:14px; cursor: pointer;">
+        <input type="checkbox" id="regEmerg" style="width: auto; margin: 0;"> Emergency Service?
+    </label>
+    
+    <button class="save-btn" id="saveBtn">Save & Publish</button>
+    <button onclick="location.reload()" style="background:none; border:none; color: #94a3b8; width: 100%; margin-top: 10px; cursor: pointer;">Cancel</button>
   </div>
 </div>
 
+<!-- Bottom Navigation Bar -->
 <div class="nav">
-  <a href="index.html" class="nav-item active">Home</a>
+  <div class="nav-item active" onclick="location.reload()">Home</div>
   <a href="profile.html?page=chats" class="nav-item">Chats</a>
-  <a href="#" class="nav-item" onclick="accessAdmin()">Portal</a>
+  <div class="nav-item" id="portalBtn" onclick="accessAdmin()">Portal</div>
 </div>
 
 <script>
+// Firebase Config
 const firebaseConfig = {
   apiKey: "AIzaSyCmOWTieB2TsG4caLergqTlfRYCB1_2WMM",
   authDomain: "ff-online-gaming-apps.firebaseapp.com",
@@ -108,14 +131,21 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 
+// Admin Access Logic
 function accessAdmin() {
-    let pass = prompt("Enter Admin Password:");
+    let pass = prompt("Portal Password:");
     if(pass === "1234") { 
-        document.querySelectorAll('.section').forEach(s=>s.classList.remove('show'));
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('show'));
         document.getElementById('adminSection').classList.add('show');
+        
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        document.getElementById('portalBtn').classList.add('active');
+    } else if(pass !== null) {
+        alert("Wrong Password!");
     }
 }
 
+// Save Data to Firebase
 document.getElementById('saveBtn').onclick = function() {
     const name = document.getElementById('regName').value;
     const phone = document.getElementById('regPhone').value;
@@ -125,7 +155,10 @@ document.getElementById('saveBtn').onclick = function() {
     const file = document.getElementById('regPhotoFile').files[0];
     const emerg = document.getElementById('regEmerg').checked;
 
-    if(!name || !phone || !file || !desc) { alert("সব তথ্য সঠিকভাবে পূরণ করুন!"); return; }
+    if(!name || !phone || !file || !desc) { 
+        alert("Please fill all details and select a photo!"); 
+        return; 
+    }
 
     const reader = new FileReader();
     reader.readAsDataURL(file);
@@ -138,25 +171,31 @@ document.getElementById('saveBtn').onclick = function() {
             photo: reader.result,
             category: cat,
             isEmergency: emerg
-        }).then(() => { alert("সফলভাবে প্রোফাইল তৈরি হয়েছে!"); location.reload(); });
+        }).then(() => { 
+            alert("Profile successfully added!"); 
+            location.reload(); 
+        }).catch(e => alert("Error: " + e.message));
     };
 };
 
+// Open Helpers List
 function openHelpers(category){
   document.getElementById('homeSection').classList.remove('show');
   document.getElementById('helpersSection').classList.add('show');
   document.getElementById('helpersTitle').innerText = category;
+  
   const list = document.getElementById('helpersList');
-  list.innerHTML = '<p style="text-align:center; padding:20px;">Loading...</p>';
+  list.innerHTML = '<p style="text-align:center; padding:50px; opacity:0.6;">Loading global data...</p>';
 
   database.ref('helpers/').once('value', (snapshot) => {
     list.innerHTML = '';
+    let found = false;
     snapshot.forEach((childSnapshot) => {
         const h = childSnapshot.val();
         if(h.category === category) {
+            found = true;
             const div = document.createElement('div');
             div.className = 'helper-list-item';
-            // ডেসক্রিপশন যাতে URL এ পাঠানো যায় তাই encodeURIComponent ব্যবহার করা হয়েছে
             const encodedDesc = encodeURIComponent(h.description);
             div.innerHTML = `
                 <div class="helper-info">
@@ -167,9 +206,9 @@ function openHelpers(category){
             list.appendChild(div);
         }
     });
+    if(!found) list.innerHTML = '<p style="text-align:center; padding:50px; opacity:0.5;">No helpers found in this category.</p>';
   });
 }
 </script>
 </body>
 </html>
-<
