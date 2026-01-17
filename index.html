@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nearby Helper Chat</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Poppins;}
+body{
+  background:#0f172a;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+}
+
+.chat-app{
+  width:360px;
+  height:640px;
+  background:#020617;
+  border-radius:20px;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  color:white;
+}
+
+/* Header */
+.header{
+  background:#16a34a;
+  padding:12px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.header img{
+  width:40px;
+  height:40px;
+  border-radius:50%;
+}
+.header h4{font-size:16px;}
+.header span{font-size:12px;opacity:.9}
+
+/* Messages */
+.chat-body{
+  flex:1;
+  padding:12px;
+  overflow-y:auto;
+}
+
+.msg{
+  max-width:75%;
+  padding:10px 14px;
+  margin-bottom:10px;
+  border-radius:16px;
+  font-size:14px;
+}
+
+.me{
+  background:#16a34a;
+  margin-left:auto;
+  border-bottom-right-radius:4px;
+}
+
+.other{
+  background:#1e293b;
+  margin-right:auto;
+  border-bottom-left-radius:4px;
+}
+
+/* Input */
+.chat-input{
+  display:flex;
+  gap:8px;
+  padding:10px;
+}
+.chat-input input{
+  flex:1;
+  padding:10px;
+  border-radius:20px;
+  border:none;
+  outline:none;
+}
+.chat-input button{
+  background:#16a34a;
+  border:none;
+  padding:10px 16px;
+  border-radius:50%;
+  color:white;
+  font-size:16px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="chat-app">
+
+  <div class="header">
+    <img src="https://i.pravatar.cc/100">
+    <div>
+      <h4>Nearby Helper</h4>
+      <span>Online</span>
+    </div>
+  </div>
+
+  <div class="chat-body" id="chatBody"></div>
+
+  <div class="chat-input">
+    <input id="msgInput" placeholder="Type message...">
+    <button onclick="sendMsg()">➤</button>
+  </div>
+
+</div>
+
+<!-- Firebase -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCmOWTieB2TsG4caLergqTlfRYCB1_2WMM",
+  authDomain: "ff-online-gaming-apps.firebaseapp.com",
+  databaseURL: "https://ff-online-gaming-apps-default-rtdb.firebaseio.com",
+  projectId: "ff-online-gaming-apps",
+  storageBucket: "ff-online-gaming-apps.firebasestorage.app",
+  messagingSenderId: "768845729474",
+  appId: "1:768845729474:web:244992645acef124b3b55b"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+// Demo user id
+const myId = "user1";
+
+// Chat reference
+const chatRef = ref(db, "nearby_helper_chat");
+
+window.sendMsg = function(){
+  const input = document.getElementById("msgInput");
+  if(input.value.trim() === "") return;
+
+  push(chatRef, {
+    sender: myId,
+    text: input.value,
+    time: Date.now()
+  });
+
+  input.value = "";
+}
+
+// Receive messages
+onChildAdded(chatRef, snapshot => {
+  const data = snapshot.val();
+  const chat = document.getElementById("chatBody");
+
+  const div = document.createElement("div");
+  div.className = "msg " + (data.sender === myId ? "me" : "other");
+  div.innerText = data.text;
+
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+});
+</script>
+
+</body>
+</html>
