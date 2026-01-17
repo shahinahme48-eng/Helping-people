@@ -1,162 +1,173 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Nearby Helper + Live Chat</title>
-
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-
-<style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:Poppins;}
-body{background:#0f172a;color:white;min-height:100vh;display:flex;flex-direction:column;}
-.header{padding:16px;background:#020617;text-align:center;color:#22c55e;font-weight:bold;}
-.section{display:none;flex:1;overflow:auto;}
-.show{display:flex;}
-.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding:0 12px;margin-top:10px;}
-.card{background:#1e293b;border-radius:15px;padding:20px;text-align:center;border:1px solid #334155;cursor:pointer;transition:.2s;}
-.card span{font-size:36px;display:block;margin-bottom:8px;}
-.list{padding:10px;}
-.item{background:#020617;border-radius:14px;padding:12px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;border:1px solid #1e293b;}
-.info{display:flex;gap:10px;align-items:center;}
-.pic{width:50px;height:50px;border-radius:50%;object-fit:cover;border:2px solid #22c55e;}
-.btn{background:#22c55e;color:black;padding:6px 12px;border-radius:10px;font-weight:bold;text-decoration:none;font-size:14px;}
-.input-box{display:flex;padding:8px;background:#020617;position:sticky;bottom:0;}
-.input-box input{flex:1;padding:12px;border-radius:10px;border:none;margin-right:8px;background:#1e293b;color:white;}
-.input-box button{padding:12px 16px;border:none;border-radius:10px;background:#22c55e;font-weight:bold;cursor:pointer;}
-.messages{flex:1;overflow-y:auto;padding:12px;}
-.msg{margin-bottom:6px;padding:8px 12px;border-radius:12px;max-width:75%;}
-.me{background:#22c55e;color:black;margin-left:auto;}
-.other{background:#1e293b;}
-.nav{display:flex;border-top:1px solid #1e293b;background:#020617;}
-.nav div{flex:1;text-align:center;padding:12px;font-size:14px;opacity:.6;cursor:pointer;}
-.nav .active{opacity:1;color:#22c55e;font-weight:bold;}
-.filter{display:flex;justify-content:center;margin:10px 0;gap:10px;}
-.filter button{padding:6px 12px;background:#334155;color:white;border:none;border-radius:10px;cursor:pointer;}
-.filter .active{background:#22c55e;color:black;font-weight:bold;}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nearby Helper</title>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;font-family: 'Poppins', sans-serif;}
+        :root { --bg: #0f172a; --header-bg: #020617; --card-bg: #1e293b; --accent: #22c55e; --emergency: #ef4444; }
+        body{background: var(--bg); color:white; min-height:100vh; padding-bottom: 80px;}
+        .header{background: var(--header-bg); padding:20px; position: sticky; top:0; z-index: 100;}
+        .header h2{font-size:24px; color: var(--accent);}
+        .section-title{margin:20px 16px 10px; font-weight:600; font-size:18px; color: var(--accent);}
+        .grid{display:grid; grid-template-columns:repeat(2,1fr); gap:14px; padding:0 16px;}
+        .card{background: var(--card-bg); border-radius:18px; padding:25px 10px; text-align:center; cursor:pointer; border: 1px solid #334155; transition: 0.3s;}
+        .card:active{transform: scale(0.95);}
+        .card.emergency{border: 1px solid var(--emergency); background: rgba(239, 68, 68, 0.1);}
+        .card .icon{font-size:38px; margin-bottom:10px; display: block;}
+        .helper-list-item { background: var(--header-bg); margin: 10px 16px; padding: 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #1e293b;}
+        .helper-info { display: flex; align-items: center; gap: 12px; }
+        .helper-img { width: 55px; height: 55px; border-radius: 50%; object-fit: cover; background: #334155; border: 1px solid var(--accent); }
+        .view-btn {background: var(--accent); color: white; padding: 8px 18px; border-radius: 10px; text-decoration: none; font-size: 14px; font-weight: bold;}
+        .admin-form { padding: 20px; background: var(--header-bg); margin: 16px; border-radius: 15px; border: 1px solid var(--accent); }
+        .admin-form input, .admin-form select, .admin-form textarea { width: 100%; padding: 12px; margin-bottom: 12px; border-radius: 10px; border: none; background: var(--card-bg); color: white; outline: none; font-size: 14px;}
+        .admin-form textarea { height: 100px; resize: none; }
+        .save-btn { width: 100%; padding: 14px; background: var(--accent); border: none; color: white; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 16px;}
+        .nav{position:fixed; bottom:0; left:0; width:100%; background: var(--header-bg); display:flex; justify-content:space-around; padding:15px 0; border-top:1px solid #1e293b; z-index: 1000;}
+        .nav-item{font-size:14px; opacity:.6; cursor:pointer; color: white; text-decoration: none; text-align: center; flex: 1;}
+        .nav-item.active{opacity:1; color: var(--accent); font-weight: bold;}
+        .section{display:none;}
+        .show{display:block;}
+    </style>
 </head>
-
 <body>
 
-<div id="home" class="section show">
-  <div class="header">Nearby Helper</div>
-  <div class="filter">
-    <button class="active" onclick="setFilter(100)">All</button>
-    <button onclick="setFilter(1)">1 km</button>
-    <button onclick="setFilter(5)">5 km</button>
-    <button onclick="setFilter(10)">10 km</button>
-  </div>
-  <div class="list" id="helperList">Loading...</div>
+<div id="homeSection" class="section show">
+    <div class="header"><h2>Nearby Helper</h2></div>
+    <div class="section-title">Emergency Services</div>
+    <div class="grid">
+        <div class="card emergency" onclick="openHelpers('Plumber')"><span class="icon">🚿</span><h4>Plumber</h4></div>
+        <div class="card emergency" onclick="openHelpers('Doctor')"><span class="icon">🚑</span><h4>Doctor</h4></div>
+    </div>
+    <div class="section-title">Regular Services</div>
+    <div class="grid">
+        <div class="card" onclick="openHelpers('Electrician')"><span class="icon">🧑‍🔧</span><h4>Electrician</h4></div>
+        <div class="card" onclick="openHelpers('Car Help')"><span class="icon">🚗</span><h4>Car Help</h4></div>
+        <div class="card" onclick="openHelpers('Delivery')"><span class="icon">📦</span><h4>Delivery</h4></div>
+        <div class="card" onclick="openHelpers('Others')"><span class="icon">➕</span><h4>Others</h4></div>
+    </div>
 </div>
 
-<div id="chat" class="section">
-  <div class="messages" id="messages"></div>
-  <div class="input-box">
-    <input type="text" id="msg" placeholder="Type message...">
-    <button onclick="sendMsg()">Send</button>
-  </div>
+<div id="helpersSection" class="section">
+    <div class="header"><div onclick="location.reload()" style="cursor:pointer; color:#94a3b8; font-size: 14px;">← Back</div><h2 id="helpersTitle">Helpers</h2></div>
+    <div id="helpersList"></div>
+</div>
+
+<div id="adminSection" class="section">
+    <div class="header"><h2>Helper Portal</h2></div>
+    <div class="admin-form">
+        <input type="text" id="regName" placeholder="Full Name">
+        <input type="number" id="regPhone" placeholder="Mobile Number">
+        <input type="text" id="regDist" placeholder="Distance (e.g. 1.2 km)">
+        <textarea id="regDesc" placeholder="Describe your work or bio..."></textarea>
+        <p style="font-size:12px; color:grey; margin-bottom:5px;">Select Profile Picture:</p>
+        <input type="file" id="regPhotoFile" accept="image/*">
+        <select id="regCat">
+            <option value="Plumber">Plumber</option>
+            <option value="Doctor">Doctor</option>
+            <option value="Electrician">Electrician</option>
+            <option value="Car Help">Car Help</option>
+            <option value="Delivery">Delivery</option>
+            <option value="Others">Others</option>
+        </select>
+        <button class="save-btn" id="saveBtn">Save & Publish</button>
+    </div>
 </div>
 
 <div class="nav">
-  <div class="active" onclick="showSection('home',this)">Helpers</div>
-  <div onclick="showSection('chat',this)">Chat</div>
+    <div class="nav-item active" onclick="location.reload()">Home</div>
+    <a href="profile.html?page=chats" class="nav-item">Chats</a>
+    <div class="nav-item" onclick="accessAdmin()">Portal</div>
 </div>
 
 <script>
-// Firebase
-const firebaseConfig={
- apiKey:"AIzaSyCmOWTieB2TsG4caLergqTlfRYCB1_2WMM",
- authDomain:"ff-online-gaming-apps.firebaseapp.com",
- databaseURL:"https://ff-online-gaming-apps-default-rtdb.firebaseio.com",
- projectId:"ff-online-gaming-apps"
-};
-firebase.initializeApp(firebaseConfig);
-const db=firebase.database();
-const auth=firebase.auth();
-auth.signInAnonymously().catch(e=>alert(e.message));
+    const firebaseConfig = {
+        apiKey: "AIzaSyCmOWTieB2TsG4caLergqTlfRYCB1_2WMM",
+        authDomain: "ff-online-gaming-apps.firebaseapp.com",
+        databaseURL: "https://ff-online-gaming-apps-default-rtdb.firebaseio.com",
+        projectId: "ff-online-gaming-apps",
+        storageBucket: "ff-online-gaming-apps.firebasestorage.app",
+        messagingSenderId: "768845729474",
+        appId: "1:768845729474:web:244992645acef124b3b55b"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
 
-// Live Chat
-let chatId="global_chat_demo";
-function sendMsg(){
- const text=msg.value.trim();
- if(!text) return;
- const sender=auth.currentUser.uid;
- db.ref("chats/"+chatId+"/messages").push({sender,text,time:Date.now()});
- msg.value="";
-}
-db.ref("chats/"+chatId+"/messages").on("child_added",snap=>{
- const m=snap.val();
- const div=document.createElement("div");
- div.className="msg "+(m.sender===auth.currentUser.uid?"me":"other");
- div.innerText=m.text;
- messages.appendChild(div);
- messages.scrollTop=messages.scrollHeight;
-});
+    function accessAdmin() {
+        let pass = prompt("Enter Portal Password:");
+        if(pass === "1234") { 
+            document.querySelectorAll('.section').forEach(s=>s.classList.remove('show'));
+            document.getElementById('adminSection').classList.add('show');
+        }
+    }
 
-// User Location
-let userLat=null,userLng=null;
-navigator.geolocation.watchPosition(pos=>{
- userLat=pos.coords.latitude;
- userLng=pos.coords.longitude;
- loadHelpers();
-},{enableHighAccuracy:true});
+    document.getElementById('saveBtn').onclick = function() {
+        const name = document.getElementById('regName').value;
+        const phone = document.getElementById('regPhone').value;
+        const dist = document.getElementById('regDist').value;
+        const desc = document.getElementById('regDesc').value;
+        const cat = document.getElementById('regCat').value;
+        const file = document.getElementById('regPhotoFile').files[0];
 
-// Distance Function
-function getKm(lat1,lon1,lat2,lon2){
- const R=6371;
- const dLat=(lat2-lat1)*Math.PI/180;
- const dLon=(lon2-lon1)*Math.PI/180;
- const a=Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
- return (R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)));
-}
+        if(!name || !phone || !file || !desc) { alert("সব তথ্য পূরণ করুন!"); return; }
 
-// Nearby Filter
-let maxDistance=100;
-function setFilter(km){
- maxDistance=km;
- document.querySelectorAll('.filter button').forEach(b=>b.classList.remove('active'));
- event.target.classList.add('active');
- loadHelpers();
-}
+        this.innerText = "Saving...";
+        this.disabled = true;
 
-// Load Helpers
-function loadHelpers(){
- const list=document.getElementById('helperList');
- if(!userLat) return;
- db.ref('helpers').once('value',snap=>{
-   list.innerHTML="";
-   let found=false;
-   snap.forEach(c=>{
-     const h=c.val();
-     if(h.lat && h.lng){
-       const dist=getKm(userLat,userLng,h.lat,h.lng);
-       if(dist<=maxDistance){
-         found=true;
-         const div=document.createElement('div');
-         div.className='item';
-         div.innerHTML=`<div class="info">
-          <img src="${h.photo}" class="pic">
-          <div><b>${h.name}</b><br>${dist.toFixed(2)} km</div>
-         </div>
-         <a href="tel:${h.phone}" class="btn">Call</a>`;
-         list.appendChild(div);
-       }
-     }
-   });
-   if(!found) list.innerHTML="<p style='text-align:center;opacity:0.5;'>No helpers nearby</p>";
- });
-}
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = function () {
+            database.ref('helpers/').push({
+                name: name,
+                phone: phone,
+                distance: dist,
+                description: desc,
+                category: cat,
+                photo: reader.result
+            }).then(() => { 
+                alert("সফলভাবে সেভ হয়েছে!"); 
+                location.reload(); 
+            }).catch(e => {
+                alert("ভুল হয়েছে: " + e.message);
+                document.getElementById('saveBtn').disabled = false;
+                document.getElementById('saveBtn').innerText = "Save & Publish";
+            });
+        };
+    };
 
-// Section Switch
-function showSection(id,el){
- document.querySelectorAll('.section').forEach(s=>s.classList.remove('show'));
- document.getElementById(id).classList.add('show');
- document.querySelectorAll('.nav div').forEach(d=>d.classList.remove('active'));
- el.classList.add('active');
-}
+    function openHelpers(category){
+        document.getElementById('homeSection').classList.remove('show');
+        document.getElementById('helpersSection').classList.add('show');
+        document.getElementById('helpersTitle').innerText = category;
+        const list = document.getElementById('helpersList');
+        list.innerHTML = '<p style="text-align:center; padding:50px;">Loading global data...</p>';
+
+        database.ref('helpers/').once('value', (snapshot) => {
+            list.innerHTML = '';
+            let found = false;
+            snapshot.forEach((childSnapshot) => {
+                const h = childSnapshot.val();
+                if(h.category === category) {
+                    found = true;
+                    const div = document.createElement('div');
+                    div.className = 'helper-list-item';
+                    const encodedDesc = encodeURIComponent(h.description);
+                    div.innerHTML = `
+                        <div class="helper-info">
+                            <img src="${h.photo}" class="helper-img">
+                            <div><h4>${h.name}</h4><small>${h.distance} away</small></div>
+                        </div>
+                        <a href="helperDetail.html?name=${h.name}&dist=${h.distance}&phone=${h.phone}&desc=${encodedDesc}" class="view-btn">View</a>`;
+                    list.appendChild(div);
+                }
+            });
+            if(!found) list.innerHTML = '<p style="text-align:center; padding:50px; opacity:0.5;">No helpers found in this category.</p>';
+        });
+    }
 </script>
 </body>
 </html>
