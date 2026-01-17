@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nearby Helper – Home</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Poppins;}
+body{
+  background:#0f172a;
+  color:white;
+}
+
+/* Header */
+.header{
+  background:#020617;
+  padding:16px;
+}
+.header h2{
+  font-size:20px;
+}
+.header span{
+  font-size:13px;
+  opacity:.8;
+}
+
+/* Categories */
+.container{
+  padding:16px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:14px;
+}
+
+.card{
+  background:#020617;
+  border-radius:16px;
+  padding:20px;
+  text-align:center;
+  cursor:pointer;
+  transition:.2s;
+}
+.card:hover{
+  background:#1e293b;
+}
+.card .icon{
+  font-size:32px;
+  margin-bottom:10px;
+}
+.card h4{
+  font-size:15px;
+}
+
+/* Bottom Nav */
+.nav{
+  position:fixed;
+  bottom:0;
+  left:0;
+  width:100%;
+  background:#020617;
+  display:flex;
+  justify-content:space-around;
+  padding:10px 0;
+}
+.nav div{
+  font-size:13px;
+  opacity:.7;
+}
+.nav .active{
+  opacity:1;
+  color:#22c55e;
+}
+</style>
+</head>
+
+<body>
+
+<!-- Header -->
+<div class="header">
+  <h2>Nearby Helper</h2>
+  <span>Find help around you</span>
+</div>
+
+<!-- Categories -->
+<div class="container">
+  <div class="grid">
+
+    <div class="card" onclick="openCategory('electrician')">
+      <div class="icon">🧑‍🔧</div>
+      <h4>Electrician</h4>
+    </div>
+
+    <div class="card" onclick="openCategory('medical')">
+      <div class="icon">🚑</div>
+      <h4>Medical Help</h4>
+    </div>
+
+    <div class="card" onclick="openCategory('car')">
+      <div class="icon">🚗</div>
+      <h4>Car Help</h4>
+    </div>
+
+    <div class="card" onclick="openCategory('delivery')">
+      <div class="icon">📦</div>
+      <h4>Delivery</h4>
+    </div>
+
+    <div class="card" onclick="openCategory('plumber')">
+      <div class="icon">🚿</div>
+      <h4>Plumber</h4>
+    </div>
+
+    <div class="card" onclick="openCategory('others')">
+      <div class="icon">➕</div>
+      <h4>Others</h4>
+    </div>
+
+  </div>
+</div>
+
+<!-- Bottom Navigation -->
+<div class="nav">
+  <div class="active">Home</div>
+  <div onclick="alert('Profile page next')">Profile</div>
+  <div onclick="alert('Chats page next')">Chats</div>
+</div>
+
+<script>
+function openCategory(type){
+  alert("Open helpers for: " + type);
+  // future: window.location = "helpers.html?cat="+type;
+}
+</script>
+
+</body>
+</html>
