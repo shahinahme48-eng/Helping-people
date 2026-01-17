@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Helper Detail</title>
+<style>
+body{margin:0;font-family:Poppins;background:#0f172a;color:white;min-height:100vh;}
+.header{background:#020617;padding:16px;}
+.header h2{font-size:20px;display:flex;align-items:center;gap:10px;}
+.header span{font-size:13px;opacity:.8;}
+.emergency-label{background:#ef4444;color:white;padding:4px 8px;border-radius:8px;font-size:12px;font-weight:600;}
+.container{padding:16px;}
+.card{background:#020617;border-radius:16px;padding:20px;margin-bottom:12px;text-align:center;}
+button{background:#22c55e;color:white;border:none;padding:12px 20px;border-radius:12px;font-size:14px;margin:6px;cursor:pointer;transition:.2s;}
+button:hover{background:#16a34a;}
+.nav{position:fixed;bottom:0;left:0;width:100%;background:#020617;display:flex;justify-content:space-around;padding:10px 0;border-top:1px solid #1e293b;}
+.nav div{font-size:13px;opacity:.7;cursor:pointer;}
+.nav .active{opacity:1;color:#22c55e;}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h2 id="helperName">Helper Name</h2>
+  <span id="helperDistance">Distance: 2 km</span>
+</div>
+
+<div id="emergencyLabelContainer" style="padding:16px;"></div>
+
+<div class="container">
+  <div class="card">
+    <h4>Actions</h4>
+    <button onclick="callHelper()">📞 Call</button>
+    <button onclick="messageHelper()">💬 Message</button>
+    <button onclick="showLocation()">📍 View Location</button>
+  </div>
+</div>
+
+<div class="nav">
+  <div onclick="window.location.href='index.html'">Home</div>
+  <div onclick="window.location.href='profile.html'">Profile</div>
+  <div onclick="window.location.href='chats.html'">Chats</div>
+</div>
+
+<script>
+// Get helper info from URL
+const params = new URLSearchParams(window.location.search);
+const name = params.get('name') || 'Helper Name';
+const distance = params.get('distance') || '2 km';
+
+// Emergency detection
+const emergencyCategories = ['Plumber Emergency','Electrician Emergency','Medical Emergency'];
+const isEmergency = emergencyCategories.some(cat=>name.includes(cat) || params.get('cat')===cat);
+
+document.getElementById('helperName').innerText = name;
+document.getElementById('helperDistance').innerText = "Distance: " + distance;
+
+if(isEmergency){
+  const label = document.createElement('div');
+  label.className='emergency-label';
+  label.innerText='EMERGENCY';
+  document.getElementById('emergencyLabelContainer').appendChild(label);
+}
+
+function callHelper(){
+  alert('Calling ' + name + '...');
+}
+
+function messageHelper(){
+  alert('Messaging ' + name + '...');
+}
+
+function showLocation(){
+  alert('Showing ' + name + ' on map...');
+}
+</script>
+
+</body>
+</html>
