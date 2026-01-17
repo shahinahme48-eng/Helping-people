@@ -3,71 +3,67 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Nearby Helper – Home</title>
+<title>Profile & Chats</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:Poppins;}
-body{background:#0f172a;color:white;min-height:100vh;}
+body{margin:0;font-family:Poppins;background:#0f172a;color:white;min-height:100vh;}
 .header{background:#020617;padding:16px;}
 .header h2{font-size:20px;}
 .header span{font-size:13px;opacity:.8;}
-.header input{margin-top:10px;width:100%;padding:8px 12px;border:none;border-radius:10px;background:#1e293b;color:white;font-size:14px;}
-.section-title{margin:16px 16px 8px;font-weight:600;font-size:16px;color:#22c55e;}
-.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;padding:0 16px 16px 16px;}
-.card{background:#020617;border-radius:16px;padding:20px;text-align:center;cursor:pointer;transition:.3s;}
-.card:hover{background:#1e293b;transform: scale(1.05);box-shadow:0 8px 20px rgba(0,0,0,0.3);}
-.card .icon{font-size:32px;margin-bottom:10px;}
-.card h4{font-size:15px;}
-.card.emergency{border:2px solid #ef4444;background:#311b1b;} /* Emergency Red Style */
+.container{padding:16px;}
+.card{background:#020617;border-radius:16px;padding:20px;margin-bottom:12px;}
 .nav{position:fixed;bottom:0;left:0;width:100%;background:#020617;display:flex;justify-content:space-around;padding:10px 0;border-top:1px solid #1e293b;}
-.nav div{font-size:13px;opacity:.7;cursor:pointer;}
-.nav .active{opacity:1;color:#22c55e;}
-@media(max-width:500px){.grid{grid-template-columns:1fr;}}
+.nav-item{font-size:13px;opacity:.7;cursor:pointer;}
+.nav-item.active{opacity:1;color:#22c55e;}
+.section{display:none;}
 </style>
 </head>
 <body>
 
+<!-- Profile Section -->
+<div id="profilePage" class="section" style="display:block;">
 <div class="header">
-  <h2>Nearby Helper</h2>
-  <span>Find help around you</span>
-  <input type="text" id="searchInput" placeholder="Search helpers...">
+  <h2>Profile</h2>
+  <span>Your personal info</span>
+</div>
+<div class="container">
+  <div class="card">Name: John Doe</div>
+  <div class="card">Email: johndoe@example.com</div>
+  <div class="card">Phone: +880123456789</div>
+</div>
 </div>
 
-<!-- Emergency Section -->
-<div class="section-title">Emergency</div>
-<div class="grid" id="emergencyGrid">
-  <div class="card emergency" onclick="openCategory('Plumber Emergency')"><div class="icon">🚿</div><h4>Plumber Emergency</h4></div>
-  <div class="card emergency" onclick="openCategory('Electrician Emergency')"><div class="icon">🧑‍🔧</div><h4>Electrician Emergency</h4></div>
-  <div class="card emergency" onclick="openCategory('Medical Emergency')"><div class="icon">🚑</div><h4>Ambulance / Doctor</h4></div>
+<!-- Chats Section -->
+<div id="chatsPage" class="section">
+<div class="header">
+  <h2>Chats</h2>
+  <span>Your messages</span>
 </div>
-
-<!-- Normal Section -->
-<div class="section-title">Normal</div>
-<div class="grid" id="normalGrid">
-  <div class="card" onclick="openCategory('Electrician')"><div class="icon">🧑‍🔧</div><h4>Electrician</h4></div>
-  <div class="card" onclick="openCategory('Medical')"><div class="icon">🚑</div><h4>Medical Help</h4></div>
-  <div class="card" onclick="openCategory('Car')"><div class="icon">🚗</div><h4>Car Help</h4></div>
-  <div class="card" onclick="openCategory('Delivery')"><div class="icon">📦</div><h4>Delivery</h4></div>
-  <div class="card" onclick="openCategory('Plumber')"><div class="icon">🚿</div><h4>Plumber</h4></div>
-  <div class="card" onclick="openCategory('Others')"><div class="icon">➕</div><h4>Others</h4></div>
+<div class="container">
+  <div class="card">Ali: Hi, are you available?</div>
+  <div class="card">Rahim: Can you help me with wiring?</div>
+  <div class="card">Dr. Ayesha: Appointment confirmed</div>
+</div>
 </div>
 
 <div class="nav">
-  <div class="active" onclick="window.location.href='index.html'">Home</div>
-  <div onclick="window.location.href='profile.html'">Profile</div>
-  <div onclick="window.location.href='chats.html'">Chats</div>
+  <div class="nav-item" data-link="#profilePage">Profile</div>
+  <div class="nav-item" data-link="#chatsPage">Chats</div>
+  <div class="nav-item" data-link="file1.html">Home</div>
 </div>
 
 <script>
-function openCategory(cat){
-  window.location.href = "helpers.html?cat="+encodeURIComponent(cat);
-}
-
-// Search Filter for both sections
-document.getElementById('searchInput').addEventListener('input', function(){
-  const val = this.value.toLowerCase();
-  [...document.querySelectorAll('#emergencyGrid .card'), ...document.querySelectorAll('#normalGrid .card')].forEach(card=>{
-    const txt = card.innerText.toLowerCase();
-    card.style.display = txt.includes(val)?'block':'none';
+// Section toggle
+const navItems=document.querySelectorAll('.nav-item');
+navItems.forEach(item=>{
+  item.addEventListener('click',()=>{
+    document.querySelectorAll('.section').forEach(s=>s.style.display='none');
+    if(item.dataset.link.startsWith('#')){
+      document.querySelector(item.dataset.link).style.display='block';
+    } else {
+      window.location.href=item.dataset.link;
+    }
+    navItems.forEach(i=>i.classList.remove('active'));
+    item.classList.add('active');
   });
 });
 </script>
