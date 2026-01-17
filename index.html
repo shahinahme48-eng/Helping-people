@@ -3,26 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nearby Helper - Final Fix</title>
-    <!-- Firebase SDK -->
+    <title>Nearby Helper - Support Fix</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <style>
         *{margin:0;padding:0;box-sizing:border-box;font-family: 'Poppins', sans-serif;}
         :root { --bg: #0f172a; --header-bg: #020617; --card-bg: #1e293b; --accent: #22c55e; --emergency: #ef4444; }
         body{background: var(--bg); color:white; min-height:100vh; padding-bottom: 80px;}
-        
         .header{background: var(--header-bg); padding:20px; position: sticky; top:0; z-index: 100;}
         .header h2{font-size:22px; color: var(--accent);}
-        
         .section-title{margin:20px 16px 10px; font-weight:600; font-size:18px; color: var(--accent);}
         .grid{display:grid; grid-template-columns:repeat(2,1fr); gap:14px; padding:0 16px;}
-        .card{background: var(--card-bg); border-radius:18px; padding:25px 10px; text-align:center; cursor:pointer; border: 1px solid #334155; transition: 0.3s;}
-        .card:active{transform: scale(0.95);}
+        .card{background: var(--card-bg); border-radius:18px; padding:25px 10px; text-align:center; cursor:pointer; border: 1px solid #334155;}
         .card.emergency{border: 1px solid var(--emergency); background: rgba(239, 68, 68, 0.1);}
         .card .icon{font-size:35px; margin-bottom:10px; display: block;}
         
-        /* Contact Admin Box */
         .contact-admin {
             margin: 30px 16px 10px;
             padding: 15px;
@@ -31,15 +26,24 @@
             border-radius: 12px;
             text-align: center;
         }
-        .tg-btn { display: inline-block; background: #0088cc; color: white; text-decoration: none; padding: 8px 15px; border-radius: 8px; font-size: 14px; margin-top: 5px; }
+        .support-btn { 
+            display: inline-block; 
+            background: #0088cc; 
+            color: white; 
+            padding: 10px 20px; 
+            border-radius: 8px; 
+            font-size: 14px; 
+            font-weight: bold; 
+            cursor: pointer;
+            border: none;
+            margin-top: 10px;
+        }
 
-        /* Helper List Item */
         .helper-list-item { background: var(--header-bg); margin: 10px 16px; padding: 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #1e293b;}
         .helper-info { display: flex; align-items: center; gap: 12px; }
         .helper-img { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; background: #334155; border: 1px solid var(--accent); }
         .view-btn {background: var(--accent); color: white; padding: 8px 15px; border-radius: 8px; text-decoration: none; font-size: 14px;}
         
-        /* Forms */
         .admin-form { padding: 20px; background: var(--header-bg); margin: 16px; border-radius: 15px; border: 1px solid var(--accent); }
         .admin-form input, .admin-form select, .admin-form textarea { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: none; background: var(--card-bg); color: white; outline: none;}
         .save-btn { width: 100%; padding: 12px; background: var(--accent); border: none; color: white; border-radius: 8px; font-weight: bold; cursor: pointer; }
@@ -50,7 +54,7 @@
         .delete-btn { background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 12px; }
 
         .nav{position:fixed; bottom:0; left:0; width:100%; background: var(--header-bg); display:flex; justify-content:space-around; padding:12px 0; border-top:1px solid #1e293b; z-index: 1000;}
-        .nav-item{font-size:12px; opacity:.6; cursor:pointer; color: white; text-decoration: none; text-align: center; flex: 1;}
+        .nav-item{font-size:12px; opacity:.6; cursor:pointer; color: white; text-align: center; flex: 1;}
         .nav-item.active{opacity:1; color: var(--accent);}
         .section{display:none;}
         .show{display:block;}
@@ -58,7 +62,6 @@
 </head>
 <body>
 
-<!-- Home Page -->
 <div id="homeSection" class="section show">
     <div class="header"><h2>Nearby Helper</h2></div>
     <div class="section-title">Emergency Services</div>
@@ -75,27 +78,24 @@
     </div>
 
     <div class="contact-admin">
-        <p>যেকোনো সমস্যা বা তথ্য সংশোধনের জন্য অ্যাডমিনের সাথে যোগাযোগ করুন</p>
-        <a href="https://t.me/personaapps" target="_blank" class="tg-btn">Telegram Admin</a>
+        <p>তথ্য সংশোধন বা সাহায্যের জন্য যোগাযোগ করুন</p>
+        <button onclick="openTelegram()" class="support-btn">Telegram Admin</button>
     </div>
 </div>
 
-<!-- Helpers List -->
 <div id="helpersSection" class="section">
     <div class="header"><div onclick="location.reload()" style="cursor:pointer; color:#94a3b8;">← Back</div><h2 id="helpersTitle">Helpers</h2></div>
     <div id="helpersList"></div>
 </div>
 
-<!-- Portal (Open Registration) -->
 <div id="portalSection" class="section">
-    <div class="header"><h2>Helper Portal</h2><span>সবাই এখান থেকে প্রোফাইল খুলতে পারবেন</span></div>
+    <div class="header"><h2>Helper Portal</h2></div>
     <div class="admin-form">
-        <h4 style="margin-bottom:10px; color:var(--accent);">নতুন প্রোফাইল তৈরি করুন</h4>
-        <input type="text" id="regName" placeholder="নাম">
-        <input type="number" id="regPhone" placeholder="মোবাইল নম্বর">
-        <input type="text" id="regDist" placeholder="দূরত্ব (যেমন ১.২ কিমি)">
-        <textarea id="regDesc" placeholder="আপনার কাজের বা চেম্বারের বিবরণ..."></textarea>
-        <p style="font-size:11px; color:grey; margin-bottom:5px;">Select Photo:</p>
+        <h4 style="margin-bottom:10px; color:var(--accent);">Create New Profile</h4>
+        <input type="text" id="regName" placeholder="Name">
+        <input type="number" id="regPhone" placeholder="Phone Number">
+        <input type="text" id="regDist" placeholder="Distance (e.g. 1.2 km)">
+        <textarea id="regDesc" placeholder="Bio..."></textarea>
         <input type="file" id="regPhotoFile" accept="image/*">
         <select id="regCat">
             <option value="Plumber">Plumber</option>
@@ -109,25 +109,21 @@
     </div>
 </div>
 
-<!-- Admin Section (Password: 2919868) -->
 <div id="adminSection" class="section">
-    <div class="header"><h2>Admin Control</h2><span>ম্যানেজমেন্ট সেকশন</span></div>
+    <div class="header"><h2>Admin Control</h2></div>
     <div class="admin-form">
-        <h4 style="margin-bottom:15px; color:var(--accent);">Manage All Profiles</h4>
-        <div id="adminManageList">Data Loading...</div>
+        <div id="adminManageList">Loading...</div>
     </div>
 </div>
 
-<!-- Navbar -->
 <div class="nav">
     <div class="nav-item active" onclick="location.reload()">Home</div>
     <div class="nav-item" onclick="showSection('portalSection')">Portal</div>
     <div class="nav-item" onclick="accessAdmin()">Admin</div>
-    <a href="https://t.me/personaapps" target="_blank" class="nav-item">Support</a>
+    <div class="nav-item" onclick="openTelegram()">Support</div>
 </div>
 
 <script>
-    // Firebase Config
     const firebaseConfig = {
         apiKey: "AIzaSyCmOWTieB2TsG4caLergqTlfRYCB1_2WMM",
         authDomain: "ff-online-gaming-apps.firebaseapp.com",
@@ -140,22 +136,22 @@
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
 
-    let currentEditKey = null;
+    // টেলিগ্রাম খোলার স্মার্ট ফাংশন
+    function openTelegram() {
+        window.location.href = "https://t.me/personaapps";
+    }
 
     function accessAdmin() {
-        let pass = prompt("অ্যাডমিন পাসওয়ার্ড দিন:");
+        let pass = prompt("Admin Password:");
         if(pass === "2919868") { 
             showSection('adminSection');
             loadAdminManageList();
-        } else if(pass !== null) {
-            alert("ভুল পাসওয়ার্ড!");
         }
     }
 
     function showSection(id) {
         document.querySelectorAll('.section').forEach(s=>s.classList.remove('show'));
         document.getElementById(id).classList.add('show');
-        document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
     }
 
     document.getElementById('saveBtn').onclick = function() {
@@ -166,33 +162,15 @@
         const cat = document.getElementById('regCat').value;
         const dist = document.getElementById('regDist').value;
 
-        if(!name || !phone || !desc) { alert("সব তথ্য পূরণ করুন!"); return; }
+        if(!name || !phone || !desc || !file) { alert("Fill all details!"); return; }
 
-        const saveData = (photoData) => {
-            let dataObj = { name, phone, description: desc, category: cat, distance: dist };
-            if(photoData) dataObj.photo = photoData;
-
-            if(currentEditKey) {
-                database.ref('helpers/' + currentEditKey).update(dataObj).then(() => {
-                    alert("Update Successful!");
-                    location.reload();
-                });
-            } else {
-                if(!photoData) { alert("ছবি সিলেক্ট করুন!"); return; }
-                database.ref('helpers/').push(dataObj).then(() => {
-                    alert("Profile Saved!");
-                    location.reload();
-                });
-            }
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => {
+            database.ref('helpers/').push({
+                name, phone, description: desc, category: cat, distance: dist, photo: reader.result
+            }).then(() => { alert("Saved!"); location.reload(); });
         };
-
-        if(file) {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = () => saveData(reader.result);
-        } else {
-            saveData(null);
-        }
     };
 
     function loadAdminManageList() {
@@ -217,13 +195,10 @@
     }
 
     function deleteHelper(key) {
-        if(confirm("প্রোফাইলটি ডিলিট করতে চান?")) {
-            database.ref('helpers/' + key).remove();
-        }
+        if(confirm("Delete?")) database.ref('helpers/' + key).remove();
     }
 
-    window.prepareEdit = function(key) {
-        currentEditKey = key;
+    function prepareEdit(key) {
         database.ref('helpers/' + key).once('value', snap => {
             const h = snap.val();
             showSection('portalSection');
@@ -232,30 +207,24 @@
             document.getElementById('regDist').value = h.distance;
             document.getElementById('regDesc').value = h.description;
             document.getElementById('regCat').value = h.category;
-            document.querySelector('#portalSection h4').innerText = "Update Helper Profile";
-            document.getElementById('saveBtn').innerText = "Save Changes";
+            window.currentEditKey = key;
         });
     }
 
     function openHelpers(category){
         showSection('helpersSection');
         document.getElementById('helpersTitle').innerText = category;
-        const list = document.getElementById('helpersList');
-        list.innerHTML = 'Data Fetching...';
-
         database.ref('helpers/').once('value', (snapshot) => {
+            const list = document.getElementById('helpersList');
             list.innerHTML = '';
             snapshot.forEach((childSnapshot) => {
                 const h = childSnapshot.val();
                 if(h.category === category) {
+                    const encodedDesc = encodeURIComponent(h.description);
                     const div = document.createElement('div');
                     div.className = 'helper-list-item';
-                    const encodedDesc = encodeURIComponent(h.description);
                     div.innerHTML = `
-                        <div class="helper-info">
-                            <img src="${h.photo}" class="helper-img">
-                            <div><h4>${h.name}</h4><small>${h.distance} away</small></div>
-                        </div>
+                        <div class="helper-info"><img src="${h.photo}" class="helper-img"><div><h4>${h.name}</h4><small>${h.distance}</small></div></div>
                         <a href="helperDetail.html?name=${h.name}&dist=${h.distance}&phone=${h.phone}&desc=${encodedDesc}" class="view-btn">View</a>`;
                     list.appendChild(div);
                 }
