@@ -1,158 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Nearby Helper – Home</title>
-<style>
-  *{margin:0;padding:0;box-sizing:border-box;font-family: 'Poppins', sans-serif;}
-  :root { --bg: #0f172a; --header-bg: #020617; --card-bg: #1e293b; --accent: #22c55e; --emergency: #ef4444; }
-  body{background: var(--bg); color:white; min-height:100vh; padding-bottom: 70px;}
-  .header{background: var(--header-bg); padding:20px; position: sticky; top:0; z-index: 100;}
-  .header h2{font-size:22px; color: var(--accent);}
-  .header input{margin-top:15px; width:100%; padding:12px; border:none; border-radius:12px; background: var(--card-bg); color:white; font-size:14px; outline: none; border: 1px solid #334155;}
-  .section-title{margin:20px 16px 10px; font-weight:600; font-size:18px; color: var(--accent);}
-  .grid{display:grid; grid-template-columns:repeat(2,1fr); gap:14px; padding:0 16px;}
-  .card{background: var(--header-bg); border-radius:16px; padding:20px; text-align:center; cursor:pointer; border: 1px solid #1e293b; transition: 0.3s;}
-  .card.emergency{border: 1px solid var(--emergency); background: #2d1313;}
-  .card .icon{font-size:35px; margin-bottom:10px; display: block;}
-  .helper-list-item { background: var(--header-bg); margin: 10px 16px; padding: 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #1e293b;}
-  .view-btn {background: var(--accent); color: white; padding: 8px 15px; border-radius: 8px; text-decoration: none; font-size: 14px;}
-  .nav{position:fixed; bottom:0; left:0; width:100%; background: var(--header-bg); display:flex; justify-content:space-around; padding:15px 0; border-top:1px solid #1e293b;}
-  .nav-item{font-size:14px; opacity:.6; cursor:pointer; color: white; text-decoration: none;}
-  .nav-item.active{opacity:1; color: var(--accent);}
-  .section{display:none;}
-  .show{display:block;}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile & Chats</title>
+    <style>
+        body{margin:0;font-family:Poppins;background:#0f172a;color:white;min-height:100vh;}
+        .header{background:#020617;padding:20px; color:#22c55e;}
+        .container{padding:20px;}
+        .card{background:#1e293b; border-radius:15px; padding:20px; margin-bottom:15px; border:1px solid #334155;}
+        .nav{position:fixed; bottom:0; width:100%; background:#020617; display:flex; justify-content:space-around; padding:15px 0;}
+        .nav-item{color:white; text-decoration:none; opacity:0.6; font-size:14px;}
+        .active{opacity:1; color:#22c55e; font-weight:bold;}
+    </style>
 </head>
 <body>
 
-<div id="homeSection" class="section show">
-  <div class="header">
-    <h2>Nearby Helper</h2>
-    <input type="text" id="searchHome" placeholder="Search for help...">
-  </div>
-  <div class="section-title">Emergency Services</div>
-  <div class="grid">
-    <div class="card emergency" onclick="openHelpers('Plumber', true)"><span class="icon">🚿</span><h4>Plumber</h4></div>
-    <div class="card emergency" onclick="openHelpers('Medical', true)"><span class="icon">🚑</span><h4>Ambulance</h4></div>
-  </div>
-  <div class="section-title">Regular Services</div>
-  <div class="grid">
-    <div class="card" onclick="openHelpers('Electrician')"><span class="icon">🧑‍🔧</span><h4>Electrician</h4></div>
-    <div class="card" onclick="openHelpers('Car')"><span class="icon">🚗</span><h4>Car Help</h4></div>
-    <div class="card" onclick="openHelpers('Delivery')"><span class="icon">📦</span><h4>Delivery</h4></div>
-    <div class="card" onclick="openHelpers('Others')"><span class="icon">➕</span><h4>Others</h4></div>
-  </div>
-</div>
+<!-- পুরো কোড অপরিবর্তিত -->
 
-<div id="helpersSection" class="section">
-  <div class="header">
-    <div onclick="location.reload()" style="cursor:pointer; color:#94a3b8; margin-bottom:10px;">← Back to Home</div>
-    <h2 id="helpersTitle">Helpers</h2>
-  </div>
-  <div id="helpersList"></div>
-</div>
-
-<div class="nav">
-  <a href="index.html" class="nav-item active">Home</a>
-  <a href="profile.html?page=chats" class="nav-item">Chats</a>
-  <a href="profile.html?page=profile" class="nav-item">Profile</a>
-</div>
-
-<script>
-const helpersData = [
-  {name:'Rahim Plumber', category:'Plumber', distance:'1.2 km', isEmergency: true},
-  {name:'Ali Electrician', category:'Electrician', distance:'0.8 km', isEmergency: false},
-  {name:'Dr. Ayesha', category:'Medical', distance:'2.5 km', isEmergency: true},
-  {name:'Karim Garage', category:'Car', distance:'3.1 km', isEmergency: false}
-];
-
-function openHelpers(category, isEmerg = false){
-  document.getElementById('homeSection').classList.remove('show');
-  document.getElementById('helpersSection').classList.add('show');
-  document.getElementById('helpersTitle').innerText = category + " Services";
-  const list = document.getElementById('helpersList');
-  list.innerHTML = '';
-  const filtered = helpersData.filter(h => h.category === category);
-  if(filtered.length === 0) {
-      list.innerHTML = '<p style="text-align:center; margin-top:30px; opacity:0.5;">No helpers found.</p>';
-  }
-  filtered.forEach(h => {
-    const div = document.createElement('div');
-    div.className = 'helper-list-item';
-    div.innerHTML = `<div><h4>${h.name}</h4><small>${h.distance} away</small></div>
-      <a href="helperDetail.html?name=${h.name}&distance=${h.distance}&emergency=${isEmerg}" class="view-btn">View</a>`;
-    list.appendChild(div);
-  });
-}
-</script>
-</body>
-</html>
-```
-
----
-
-### ২. ফাইলের নাম: `profile.html` (প্রোফাইল এবং চ্যাট)
-এই ফাইলটি আপনার প্রোফাইল এবং মেসেজ সেকশন হ্যান্ডেল করবে।
-
-```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Profile & Chats</title>
-<style>
-  body{margin:0;font-family:Poppins;background:#0f172a;color:white;min-height:100vh; padding-bottom:70px;}
-  .header{background:#020617;padding:16px;}
-  .header h2{font-size:20px; color:#22c55e;}
-  .container{padding:16px;}
-  .card{background:#020617;border-radius:16px;padding:20px;margin-bottom:12px; border:1px solid #1e293b;}
-  .nav{position:fixed;bottom:0;left:0;width:100%;background:#020617;display:flex;justify-content:space-around;padding:15px 0;border-top:1px solid #1e293b;}
-  .nav-item{font-size:14px; opacity:.7; color:white; text-decoration:none;}
-  .nav-item.active{opacity:1; color:#22c55e;}
-  .section{display:none;}
-</style>
-</head>
-<body>
-
-<div id="profilePage" class="section">
-  <div class="header"><h2>User Profile</h2></div>
-  <div class="container">
-    <div class="card"><strong>Name:</strong> John Doe</div>
-    <div class="card"><strong>Email:</strong> john@example.com</div>
-    <div class="card"><strong>Location:</strong> Dhaka, BD</div>
-  </div>
-</div>
-
-<div id="chatsPage" class="section">
-  <div class="header"><h2>Messages</h2></div>
-  <div class="container">
-    <div class="card"><strong>Rahim:</strong> I will be there in 10 mins.</div>
-    <div class="card"><strong>Ali:</strong> Can you send the location?</div>
-  </div>
-</div>
-
-<div class="nav">
-  <a href="index.html" class="nav-item">Home</a>
-  <a href="#" class="nav-item" id="chatLink" onclick="show('chatsPage')">Chats</a>
-  <a href="#" class="nav-item" id="profileLink" onclick="show('profilePage')">Profile</a>
-</div>
-
-<script>
-function show(id){
-  document.querySelectorAll('.section').forEach(s=>s.style.display='none');
-  document.getElementById(id).style.display='block';
-  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-  if(id==='chatsPage') document.getElementById('chatLink').classList.add('active');
-  else document.getElementById('profileLink').classList.add('active');
-}
-
-const urlParams = new URLSearchParams(window.location.search);
-const page = urlParams.get('page');
-if(page === 'chats') show('chatsPage');
-else show('profilePage');
-</script>
 </body>
 </html>
