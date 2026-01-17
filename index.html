@@ -3,56 +3,46 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Nearby Helper – Global Sync</title>
-
-<!-- Firebase SDK (Version 8 - Easy for HTML) -->
+<title>Nearby Helper – With Description</title>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-
 <style>
   *{margin:0;padding:0;box-sizing:border-box;font-family: 'Poppins', sans-serif;}
   :root { --bg: #0f172a; --header-bg: #020617; --card-bg: #1e293b; --accent: #22c55e; --emergency: #ef4444; }
   body{background: var(--bg); color:white; min-height:100vh; padding-bottom: 80px;}
-  
   .header{background: var(--header-bg); padding:20px; position: sticky; top:0; z-index: 100;}
   .header h2{font-size:22px; color: var(--accent);}
-  .header input{margin-top:15px; width:100%; padding:12px; border:none; border-radius:12px; background: var(--card-bg); color:white; font-size:14px; outline: none; border: 1px solid #334155;}
-  
-  .section-title{margin:20px 16px 10px; font-weight:600; font-size:18px; color: var(--accent);}
+  .section-title{margin:20px 16px 8px; font-weight:600; font-size:18px; color: var(--accent);}
   .grid{display:grid; grid-template-columns:repeat(2,1fr); gap:14px; padding:0 16px;}
-  .card{background: var(--header-bg); border-radius:16px; padding:20px; text-align:center; cursor:pointer; border: 1px solid #1e293b; transition: 0.3s;}
+  .card{background: var(--header-bg); border-radius:16px; padding:20px; text-align:center; cursor:pointer; border: 1px solid #1e293b;}
   .card.emergency{border: 1px solid var(--emergency); background: #2d1313;}
   .card .icon{font-size:35px; margin-bottom:10px; display: block;}
-  
   .helper-list-item { background: var(--header-bg); margin: 10px 16px; padding: 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #1e293b;}
   .helper-info { display: flex; align-items: center; gap: 12px; }
-  .helper-img { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; background: #334155; }
-  .view-btn {background: var(--accent); color: white; padding: 8px 15px; border-radius: 8px; text-decoration: none; font-size: 14px;}
+  .helper-img { width: 55px; height: 55px; border-radius: 50%; object-fit: cover; background: #334155; border: 2px solid var(--accent); }
+  .view-btn {background: var(--accent); color: white; padding: 8px 18px; border-radius: 8px; text-decoration: none; font-size: 14px; font-weight: 600;}
   
+  /* রেজিস্ট্রেশন ফরম */
   .admin-form { padding: 20px; background: var(--header-bg); margin: 16px; border-radius: 15px; border: 1px solid var(--accent); }
-  .admin-form input, .admin-form select { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: none; background: var(--card-bg); color: white; outline: none;}
-  .save-btn { width: 100%; padding: 12px; background: var(--accent); border: none; color: white; border-radius: 8px; font-weight: bold; cursor: pointer; }
+  .admin-form input, .admin-form select, .admin-form textarea { width: 100%; padding: 12px; margin-bottom: 12px; border-radius: 8px; border: none; background: var(--card-bg); color: white; outline: none; font-size: 14px;}
+  .admin-form textarea { height: 100px; resize: none; }
+  .save-btn { width: 100%; padding: 14px; background: var(--accent); border: none; color: white; border-radius: 8px; font-weight: bold; cursor: pointer; }
 
-  .nav{position:fixed; bottom:0; left:0; width:100%; background: var(--header-bg); display:flex; justify-content:space-around; padding:15px 0; border-top:1px solid #1e293b;}
+  .nav{position:fixed; bottom:0; left:0; width:100%; background: var(--header-bg); display:flex; justify-content:space-around; padding:15px 0; border-top:1px solid #1e293b; z-index: 100;}
   .nav-item{font-size:14px; opacity:.6; cursor:pointer; color: white; text-decoration: none;}
   .nav-item.active{opacity:1; color: var(--accent);}
-  
   .section{display:none;}
   .show{display:block;}
 </style>
 </head>
 <body>
 
-<!-- Home Section -->
 <div id="homeSection" class="section show">
-  <div class="header">
-    <h2>Nearby Helper</h2>
-    <input type="text" id="searchHome" placeholder="Search services...">
-  </div>
+  <div class="header"><h2>Nearby Helper</h2></div>
   <div class="section-title">Emergency Services</div>
   <div class="grid">
     <div class="card emergency" onclick="openHelpers('Plumber', true)"><span class="icon">🚿</span><h4>Plumber</h4></div>
-    <div class="card emergency" onclick="openHelpers('Medical', true)"><span class="icon">🚑</span><h4>Ambulance</h4></div>
+    <div class="card emergency" onclick="openHelpers('Medical', true)"><span class="icon">🚑</span><h4>Doctor</h4></div>
   </div>
   <div class="section-title">Regular Services</div>
   <div class="grid">
@@ -63,44 +53,49 @@
   </div>
 </div>
 
-<!-- List of Helpers -->
 <div id="helpersSection" class="section">
   <div class="header">
-    <div onclick="location.reload()" style="cursor:pointer; color:#94a3b8; margin-bottom:10px;">← Back</div>
-    <h2 id="helpersTitle">Helpers</h2>
+    <div onclick="location.reload()" style="cursor:pointer; color:#94a3b8; font-size:14px;">← Back</div>
+    <h2 id="helpersTitle" style="margin-top:5px;">Helpers</h2>
   </div>
   <div id="helpersList"></div>
 </div>
 
-<!-- Helper Registration Portal -->
+<!-- রেজিস্ট্রেশন পোর্টাল -->
 <div id="adminSection" class="section">
-  <div class="header"><h2>Helper Portal</h2><span>Add your profile to global list</span></div>
+  <div class="header"><h2>Helper Registration</h2></div>
   <div class="admin-form">
-    <input type="text" id="regName" placeholder="Helper Full Name">
-    <input type="text" id="regPhoto" placeholder="Photo URL (Image Link)">
-    <input type="text" id="regDist" placeholder="Distance (e.g. 1.5 km)">
+    <input type="text" id="regName" placeholder="Full Name (নাম)">
+    <input type="number" id="regPhone" placeholder="Phone Number (মোবাইল নম্বর)">
+    <input type="text" id="regDist" placeholder="Distance (দূরত্ব - যেমন ১.২ কিমি)">
+    
+    <p style="font-size:12px; color:var(--accent); margin-bottom:5px;">Work Description (কাজের বা নিজের বিবরণ):</p>
+    <textarea id="regDesc" placeholder="আপনার কাজের অভিজ্ঞতা বা দক্ষতা সম্পর্কে বিস্তারিত লিখুন..."></textarea>
+    
+    <p style="font-size:12px; color:grey; margin-bottom:5px;">Select Profile Picture:</p>
+    <input type="file" id="regPhotoFile" accept="image/*">
+    
     <select id="regCat">
       <option value="Plumber">Plumber</option>
-      <option value="Medical">Medical / Doctor</option>
+      <option value="Medical">Doctor / Medical</option>
       <option value="Electrician">Electrician</option>
       <option value="Car">Car Repair</option>
       <option value="Delivery">Delivery</option>
       <option value="Others">Others</option>
     </select>
-    <label style="display:block; margin: 10px 0;"><input type="checkbox" id="regEmerg"> Mark as Emergency?</label>
-    <button class="save-btn" id="saveBtn">Save & Go Live</button>
-    <button onclick="location.reload()" style="background:none; color:grey; border:none; margin-top:15px; width:100%;">Cancel</button>
+    
+    <label style="display:block; margin-bottom:15px; font-size:14px;"><input type="checkbox" id="regEmerg"> Emergency Service?</label>
+    <button class="save-btn" id="saveBtn">Save Profile</button>
   </div>
 </div>
 
 <div class="nav">
   <a href="index.html" class="nav-item active">Home</a>
   <a href="profile.html?page=chats" class="nav-item">Chats</a>
-  <a href="#" class="nav-item" onclick="accessAdmin()">Helper Portal</a>
+  <a href="#" class="nav-item" onclick="accessAdmin()">Portal</a>
 </div>
 
 <script>
-// --- ফায়ারবেস কনফিগারেশন (আপনার দেওয়া কনফিগ) ---
 const firebaseConfig = {
   apiKey: "AIzaSyCmOWTieB2TsG4caLergqTlfRYCB1_2WMM",
   authDomain: "ff-online-gaming-apps.firebaseapp.com",
@@ -110,77 +105,71 @@ const firebaseConfig = {
   messagingSenderId: "768845729474",
   appId: "1:768845729474:web:244992645acef124b3b55b"
 };
-
-// ইনিশিয়ালাইজ
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 
-// ১. পাসওয়ার্ড দিয়ে পোর্টালে ঢোকা
 function accessAdmin() {
-    let pass = prompt("এন্টার পাসওয়ার্ড (ডিফল্ট: 2919868):");
-    if(pass === "2919868") { 
+    let pass = prompt("Enter Admin Password:");
+    if(pass === "1234") { 
         document.querySelectorAll('.section').forEach(s=>s.classList.remove('show'));
         document.getElementById('adminSection').classList.add('show');
-    } else {
-        alert("ভুল পাসওয়ার্ড!");
     }
 }
 
-// ২. ডাটাবেসে সেভ করা
 document.getElementById('saveBtn').onclick = function() {
     const name = document.getElementById('regName').value;
-    const photo = document.getElementById('regPhoto').value;
+    const phone = document.getElementById('regPhone').value;
     const dist = document.getElementById('regDist').value;
+    const desc = document.getElementById('regDesc').value;
     const cat = document.getElementById('regCat').value;
+    const file = document.getElementById('regPhotoFile').files[0];
     const emerg = document.getElementById('regEmerg').checked;
 
-    if(name === "") { alert("নাম দিন!"); return; }
+    if(!name || !phone || !file || !desc) { alert("সব তথ্য সঠিকভাবে পূরণ করুন!"); return; }
 
-    database.ref('helpers/').push({
-        name: name,
-        photo: photo,
-        distance: dist,
-        category: cat,
-        isEmergency: emerg
-    }).then(() => {
-        alert("আপনার প্রোফাইল সফলভাবে সবার জন্য সেভ হয়েছে!");
-        location.reload();
-    }).catch(err => alert("Error: " + err.message));
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = function () {
+        database.ref('helpers/').push({
+            name: name,
+            phone: phone,
+            distance: dist,
+            description: desc,
+            photo: reader.result,
+            category: cat,
+            isEmergency: emerg
+        }).then(() => { alert("সফলভাবে প্রোফাইল তৈরি হয়েছে!"); location.reload(); });
+    };
 };
 
-// ৩. ডাটাবেস থেকে রিড করা
-function openHelpers(category, isEmerg = false){
+function openHelpers(category){
   document.getElementById('homeSection').classList.remove('show');
   document.getElementById('helpersSection').classList.add('show');
-  document.getElementById('helpersTitle').innerText = category + " Services";
-  
+  document.getElementById('helpersTitle').innerText = category;
   const list = document.getElementById('helpersList');
-  list.innerHTML = '<p style="text-align:center; padding:20px; opacity:0.6;">Loading global data...</p>';
+  list.innerHTML = '<p style="text-align:center; padding:20px;">Loading...</p>';
 
   database.ref('helpers/').once('value', (snapshot) => {
     list.innerHTML = '';
-    let found = false;
     snapshot.forEach((childSnapshot) => {
         const h = childSnapshot.val();
         if(h.category === category) {
-            found = true;
             const div = document.createElement('div');
             div.className = 'helper-list-item';
+            // ডেসক্রিপশন যাতে URL এ পাঠানো যায় তাই encodeURIComponent ব্যবহার করা হয়েছে
+            const encodedDesc = encodeURIComponent(h.description);
             div.innerHTML = `
                 <div class="helper-info">
-                    <img src="${h.photo || 'https://via.placeholder.com/50'}" class="helper-img">
-                    <div>
-                        <h4>${h.name}</h4>
-                        <small>${h.distance} away</small>
-                    </div>
+                    <img src="${h.photo}" class="helper-img">
+                    <div><h4>${h.name}</h4><small>${h.distance} away</small></div>
                 </div>
-                <a href="helperDetail.html?name=${h.name}&distance=${h.distance}&emergency=${h.isEmergency}" class="view-btn">View</a>`;
+                <a href="helperDetail.html?name=${h.name}&dist=${h.distance}&phone=${h.phone}&emerg=${h.isEmergency}&desc=${encodedDesc}" class="view-btn">View</a>`;
             list.appendChild(div);
         }
     });
-    if(!found) list.innerHTML = '<p style="text-align:center; margin-top:30px; opacity:0.5;">No data available in this category.</p>';
   });
 }
 </script>
 </body>
 </html>
+<
