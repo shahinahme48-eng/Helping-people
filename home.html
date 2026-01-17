@@ -3,139 +3,94 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Nearby Helper – Home</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-
+<title>Helpers List</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Poppins;}
-body{
-  background:#0f172a;
-  color:white;
-}
-
-/* Header */
-.header{
-  background:#020617;
-  padding:16px;
-}
-.header h2{
-  font-size:20px;
-}
-.header span{
-  font-size:13px;
-  opacity:.8;
-}
-
-/* Categories */
-.container{
-  padding:16px;
-}
-
-.grid{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:14px;
-}
-
-.card{
-  background:#020617;
-  border-radius:16px;
-  padding:20px;
-  text-align:center;
-  cursor:pointer;
-  transition:.2s;
-}
-.card:hover{
-  background:#1e293b;
-}
-.card .icon{
-  font-size:32px;
-  margin-bottom:10px;
-}
-.card h4{
-  font-size:15px;
-}
-
-/* Bottom Nav */
-.nav{
-  position:fixed;
-  bottom:0;
-  left:0;
-  width:100%;
-  background:#020617;
-  display:flex;
-  justify-content:space-around;
-  padding:10px 0;
-}
-.nav div{
-  font-size:13px;
-  opacity:.7;
-}
-.nav .active{
-  opacity:1;
-  color:#22c55e;
-}
+body{background:#0f172a;color:white;min-height:100vh;}
+.header{background:#020617;padding:16px;}
+.header h2{font-size:20px;}
+.header span{font-size:13px;opacity:.8;}
+.header input{margin-top:10px;width:100%;padding:8px 12px;border:none;border-radius:10px;background:#1e293b;color:white;font-size:14px;}
+.grid{display:grid;grid-template-columns:1fr;gap:14px;padding:16px;}
+.card{background:#020617;border-radius:16px;padding:20px;text-align:center;cursor:pointer;transition:.3s;}
+.card:hover{background:#1e293b;transform: scale(1.05);box-shadow:0 8px 20px rgba(0,0,0,0.3);}
+.card h4{font-size:15px;}
+.card.emergency{border:2px solid #ef4444;background:#311b1b;} 
+.nav{position:fixed;bottom:0;left:0;width:100%;background:#020617;display:flex;justify-content:space-around;padding:10px 0;border-top:1px solid #1e293b;}
+.nav div{font-size:13px;opacity:.7;cursor:pointer;}
+.nav .active{opacity:1;color:#22c55e;}
+.section-title{margin:16px 0 8px;font-weight:600;font-size:16px;color:#22c55e;}
+@media(max-width:500px){.grid{grid-template-columns:1fr;}}
 </style>
 </head>
-
 <body>
 
-<!-- Header -->
 <div class="header">
-  <h2>Nearby Helper</h2>
-  <span>Find help around you</span>
+  <h2 id="pageTitle">Helpers</h2>
+  <span id="pageSubtitle">Find helpers around you</span>
+  <input type="text" id="searchInput" placeholder="Search helpers...">
 </div>
 
-<!-- Categories -->
-<div class="container">
-  <div class="grid">
+<div class="section-title" id="emergencyTitle">Emergency</div>
+<div class="grid" id="emergencyGrid"></div>
 
-    <div class="card" onclick="openCategory('electrician')">
-      <div class="icon">🧑‍🔧</div>
-      <h4>Electrician</h4>
-    </div>
+<div class="section-title" id="normalTitle">Normal</div>
+<div class="grid" id="normalGrid"></div>
 
-    <div class="card" onclick="openCategory('medical')">
-      <div class="icon">🚑</div>
-      <h4>Medical Help</h4>
-    </div>
-
-    <div class="card" onclick="openCategory('car')">
-      <div class="icon">🚗</div>
-      <h4>Car Help</h4>
-    </div>
-
-    <div class="card" onclick="openCategory('delivery')">
-      <div class="icon">📦</div>
-      <h4>Delivery</h4>
-    </div>
-
-    <div class="card" onclick="openCategory('plumber')">
-      <div class="icon">🚿</div>
-      <h4>Plumber</h4>
-    </div>
-
-    <div class="card" onclick="openCategory('others')">
-      <div class="icon">➕</div>
-      <h4>Others</h4>
-    </div>
-
-  </div>
-</div>
-
-<!-- Bottom Navigation -->
 <div class="nav">
-  <div class="active">Home</div>
-  <div onclick="alert('Profile page next')">Profile</div>
-  <div onclick="alert('Chats page next')">Chats</div>
+  <div onclick="window.location.href='index.html'">Home</div>
+  <div onclick="window.location.href='profile.html'">Profile</div>
+  <div onclick="window.location.href='chats.html'">Chats</div>
 </div>
 
 <script>
-function openCategory(type){
-  alert("Open helpers for: " + type);
-  // future: window.location = "helpers.html?cat="+type;
+const helpersData = {
+  'Plumber Emergency': [{name:'Joe', distance:'2 km'}],
+  'Electrician Emergency': [{name:'Ali', distance:'1 km'}],
+  'Medical Emergency': [{name:'Dr. Ayesha', distance:'1 km'}],
+  
+  'Electrician':[ {name:'Rahim', distance:'3 km'}, {name:'Sami', distance:'4 km'} ],
+  'Medical':[ {name:'Nabil', distance:'2 km'} ],
+  'Car':[ {name:'Auto Garage', distance:'3 km'}, {name:'CarFix', distance:'5 km'} ],
+  'Delivery':[ {name:'FastDelivery', distance:'1 km'}, {name:'QuickShip', distance:'2 km'} ],
+  'Plumber':[ {name:'FixIt', distance:'4 km'} ],
+  'Others':[ {name:'Tutor', distance:'1 km'}, {name:'Painter', distance:'3 km'} ]
+};
+
+// Get category from URL
+const params = new URLSearchParams(window.location.search);
+const cat = params.get('cat');
+
+// Render helpers
+function renderHelpers(gridId, data, emergency=false){
+  const grid = document.getElementById(gridId);
+  data.forEach(helper=>{
+    const div = document.createElement('div');
+    div.className='card'+(emergency?' emergency':'');
+    div.innerHTML=`<h4>${helper.name} (${helper.distance})</h4>`;
+    div.onclick = ()=>window.location.href=`helperDetail.html?name=${encodeURIComponent(helper.name)}&distance=${encodeURIComponent(helper.distance)}`;
+    grid.appendChild(div);
+  });
 }
+
+// Emergency helpers first
+['Plumber Emergency','Electrician Emergency','Medical Emergency'].forEach(cat=>{
+  if(helpersData[cat]) renderHelpers('emergencyGrid', helpersData[cat], true);
+});
+
+// Normal helpers
+['Electrician','Medical','Car','Delivery','Plumber','Others'].forEach(cat=>{
+  if(helpersData[cat]) renderHelpers('normalGrid', helpersData[cat], false);
+});
+
+// Search filter
+document.getElementById('searchInput').addEventListener('input', function(){
+  const val = this.value.toLowerCase();
+  [...document.querySelectorAll('#emergencyGrid .card'), ...document.querySelectorAll('#normalGrid .card')].forEach(card=>{
+    const txt = card.innerText.toLowerCase();
+    card.style.display = txt.includes(val)?'block':'none';
+  });
+});
 </script>
 
 </body>
