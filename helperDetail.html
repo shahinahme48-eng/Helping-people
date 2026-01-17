@@ -21,8 +21,52 @@
     </style>
 </head>
 <body>
+    <div class="header">
+        <a href="index.html" style="color:#94a3b8; text-decoration:none; font-size:14px;">← Back</a>
+        <h2 id="hName" style="margin-top:5px; color:#22c55e;">Loading...</h2>
+    </div>
+    <div class="container">
+        <img id="hImg" src="" class="profile-img">
+        <h3 id="hNameBig">Name</h3>
+        <p id="hDist" style="opacity:0.7;">Distance: --</p>
+        <div class="desc-box">
+            <h4>About Service / Bio</h4>
+            <p id="hDesc">Description will load here...</p>
+        </div>
+        <div class="btn-group">
+            <a href="#" id="callBtn" class="btn btn-call">📞 Call Now</a>
+            <a href="profile.html?page=chats" class="btn btn-chat">💬 Message</a>
+        </div>
+    </div>
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const name = params.get('name');
+        const phone = params.get('phone');
+        
+        document.getElementById('hName').innerText = name;
+        document.getElementById('hNameBig').innerText = name;
+        document.getElementById('hDist').innerText = "Distance: " + params.get('dist');
+        document.getElementById('hDesc').innerText = decodeURIComponent(params.get('desc'));
+        document.getElementById('callBtn').href = "tel:" + phone;
 
-<!-- পুরো কোড অপরিবর্তিত -->
-
+        const firebaseConfig = {
+            apiKey: "AIzaSyCmOWTieB2TsG4caLergqTlfRYCB1_2WMM",
+            authDomain: "ff-online-gaming-apps.firebaseapp.com",
+            databaseURL: "https://ff-online-gaming-apps-default-rtdb.firebaseio.com",
+            projectId: "ff-online-gaming-apps",
+            storageBucket: "ff-online-gaming-apps.firebasestorage.app",
+            messagingSenderId: "768845729474",
+            appId: "1:768845729474:web:244992645acef124b3b55b"
+        };
+        if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        
+        firebase.database().ref('helpers/').once('value', snap => {
+            snap.forEach(child => {
+                if(child.val().phone === phone) {
+                    document.getElementById('hImg').src = child.val().photo;
+                }
+            });
+        });
+    </script>
 </body>
 </html>
