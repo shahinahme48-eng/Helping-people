@@ -3,167 +3,72 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Nearby Helper Chat</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-
+<title>Nearby Helper – Home</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Poppins;}
-body{
-  background:#0f172a;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  height:100vh;
-}
-
-.chat-app{
-  width:360px;
-  height:640px;
-  background:#020617;
-  border-radius:20px;
-  display:flex;
-  flex-direction:column;
-  overflow:hidden;
-  color:white;
-}
-
-/* Header */
-.header{
-  background:#16a34a;
-  padding:12px;
-  display:flex;
-  align-items:center;
-  gap:10px;
-}
-.header img{
-  width:40px;
-  height:40px;
-  border-radius:50%;
-}
-.header h4{font-size:16px;}
-.header span{font-size:12px;opacity:.9}
-
-/* Messages */
-.chat-body{
-  flex:1;
-  padding:12px;
-  overflow-y:auto;
-}
-
-.msg{
-  max-width:75%;
-  padding:10px 14px;
-  margin-bottom:10px;
-  border-radius:16px;
-  font-size:14px;
-}
-
-.me{
-  background:#16a34a;
-  margin-left:auto;
-  border-bottom-right-radius:4px;
-}
-
-.other{
-  background:#1e293b;
-  margin-right:auto;
-  border-bottom-left-radius:4px;
-}
-
-/* Input */
-.chat-input{
-  display:flex;
-  gap:8px;
-  padding:10px;
-}
-.chat-input input{
-  flex:1;
-  padding:10px;
-  border-radius:20px;
-  border:none;
-  outline:none;
-}
-.chat-input button{
-  background:#16a34a;
-  border:none;
-  padding:10px 16px;
-  border-radius:50%;
-  color:white;
-  font-size:16px;
-}
+body{background:#0f172a;color:white;min-height:100vh;}
+.header{background:#020617;padding:16px;}
+.header h2{font-size:20px;}
+.header span{font-size:13px;opacity:.8;}
+.header input{margin-top:10px;width:100%;padding:8px 12px;border:none;border-radius:10px;background:#1e293b;color:white;font-size:14px;}
+.section-title{margin:16px 16px 8px;font-weight:600;font-size:16px;color:#22c55e;}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;padding:0 16px 16px 16px;}
+.card{background:#020617;border-radius:16px;padding:20px;text-align:center;cursor:pointer;transition:.3s;}
+.card:hover{background:#1e293b;transform: scale(1.05);box-shadow:0 8px 20px rgba(0,0,0,0.3);}
+.card .icon{font-size:32px;margin-bottom:10px;}
+.card h4{font-size:15px;}
+.card.emergency{border:2px solid #ef4444;background:#311b1b;} /* Emergency Red Style */
+.nav{position:fixed;bottom:0;left:0;width:100%;background:#020617;display:flex;justify-content:space-around;padding:10px 0;border-top:1px solid #1e293b;}
+.nav div{font-size:13px;opacity:.7;cursor:pointer;}
+.nav .active{opacity:1;color:#22c55e;}
+@media(max-width:500px){.grid{grid-template-columns:1fr;}}
 </style>
 </head>
-
 <body>
 
-<div class="chat-app">
-
-  <div class="header">
-    <img src="https://i.pravatar.cc/100">
-    <div>
-      <h4>Nearby Helper</h4>
-      <span>Online</span>
-    </div>
-  </div>
-
-  <div class="chat-body" id="chatBody"></div>
-
-  <div class="chat-input">
-    <input id="msgInput" placeholder="Type message...">
-    <button onclick="sendMsg()">➤</button>
-  </div>
-
+<div class="header">
+  <h2>Nearby Helper</h2>
+  <span>Find help around you</span>
+  <input type="text" id="searchInput" placeholder="Search helpers...">
 </div>
 
-<!-- Firebase -->
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+<!-- Emergency Section -->
+<div class="section-title">Emergency</div>
+<div class="grid" id="emergencyGrid">
+  <div class="card emergency" onclick="openCategory('Plumber Emergency')"><div class="icon">🚿</div><h4>Plumber Emergency</h4></div>
+  <div class="card emergency" onclick="openCategory('Electrician Emergency')"><div class="icon">🧑‍🔧</div><h4>Electrician Emergency</h4></div>
+  <div class="card emergency" onclick="openCategory('Medical Emergency')"><div class="icon">🚑</div><h4>Ambulance / Doctor</h4></div>
+</div>
 
-const firebaseConfig = {
-  apiKey: "AIzaSyCmOWTieB2TsG4caLergqTlfRYCB1_2WMM",
-  authDomain: "ff-online-gaming-apps.firebaseapp.com",
-  databaseURL: "https://ff-online-gaming-apps-default-rtdb.firebaseio.com",
-  projectId: "ff-online-gaming-apps",
-  storageBucket: "ff-online-gaming-apps.firebasestorage.app",
-  messagingSenderId: "768845729474",
-  appId: "1:768845729474:web:244992645acef124b3b55b"
-};
+<!-- Normal Section -->
+<div class="section-title">Normal</div>
+<div class="grid" id="normalGrid">
+  <div class="card" onclick="openCategory('Electrician')"><div class="icon">🧑‍🔧</div><h4>Electrician</h4></div>
+  <div class="card" onclick="openCategory('Medical')"><div class="icon">🚑</div><h4>Medical Help</h4></div>
+  <div class="card" onclick="openCategory('Car')"><div class="icon">🚗</div><h4>Car Help</h4></div>
+  <div class="card" onclick="openCategory('Delivery')"><div class="icon">📦</div><h4>Delivery</h4></div>
+  <div class="card" onclick="openCategory('Plumber')"><div class="icon">🚿</div><h4>Plumber</h4></div>
+  <div class="card" onclick="openCategory('Others')"><div class="icon">➕</div><h4>Others</h4></div>
+</div>
 
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
+<div class="nav">
+  <div class="active" onclick="window.location.href='index.html'">Home</div>
+  <div onclick="window.location.href='profile.html'">Profile</div>
+  <div onclick="window.location.href='chats.html'">Chats</div>
+</div>
 
-// Demo user id
-const myId = "user1";
-
-// Chat reference
-const chatRef = ref(db, "nearby_helper_chat");
-
-window.sendMsg = function(){
-  const input = document.getElementById("msgInput");
-  if(input.value.trim() === "") return;
-
-  push(chatRef, {
-    sender: myId,
-    text: input.value,
-    time: Date.now()
-  });
-
-  input.value = "";
+<script>
+function openCategory(cat){
+  window.location.href = "helpers.html?cat="+encodeURIComponent(cat);
 }
 
-// Receive messages
-onChildAdded(chatRef, snapshot => {
-  const data = snapshot.val();
-  const chat = document.getElementById("chatBody");
-
-  const div = document.createElement("div");
-  div.className = "msg " + (data.sender === myId ? "me" : "other");
-  div.innerText = data.text;
-
-  chat.appendChild(div);
-  chat.scrollTop = chat.scrollHeight;
+// Search Filter for both sections
+document.getElementById('searchInput').addEventListener('input', function(){
+  const val = this.value.toLowerCase();
+  [...document.querySelectorAll('#emergencyGrid .card'), ...document.querySelectorAll('#normalGrid .card')].forEach(card=>{
+    const txt = card.innerText.toLowerCase();
+    card.style.display = txt.includes(val)?'block':'none';
+  });
 });
 </script>
 
