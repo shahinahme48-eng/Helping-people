@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nearby Helper - Support Fix</title>
+    <title>Nearby Helper - Final Admin & Support</title>
+    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <style>
@@ -18,26 +19,18 @@
         .card.emergency{border: 1px solid var(--emergency); background: rgba(239, 68, 68, 0.1);}
         .card .icon{font-size:35px; margin-bottom:10px; display: block;}
         
-        .contact-admin {
-            margin: 30px 16px 10px;
-            padding: 15px;
-            background: rgba(34, 197, 94, 0.1);
-            border: 1px dashed var(--accent);
-            border-radius: 12px;
+        /* Support Section Styling */
+        .support-container {
+            margin: 20px 16px;
+            padding: 20px;
+            background: #1e293b;
+            border-radius: 15px;
+            border: 1px solid #334155;
             text-align: center;
         }
-        .support-btn { 
-            display: inline-block; 
-            background: #0088cc; 
-            color: white; 
-            padding: 10px 20px; 
-            border-radius: 8px; 
-            font-size: 14px; 
-            font-weight: bold; 
-            cursor: pointer;
-            border: none;
-            margin-top: 10px;
-        }
+        .support-btns { display: flex; gap: 10px; margin-top: 15px; justify-content: center; }
+        .btn-wa { background: #25d366; color: white; border: none; padding: 10px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; text-decoration: none; font-size: 14px; flex: 1; }
+        .btn-tg { background: #0088cc; color: white; border: none; padding: 10px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; text-decoration: none; font-size: 14px; flex: 1; }
 
         .helper-list-item { background: var(--header-bg); margin: 10px 16px; padding: 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #1e293b;}
         .helper-info { display: flex; align-items: center; gap: 12px; }
@@ -49,11 +42,10 @@
         .save-btn { width: 100%; padding: 12px; background: var(--accent); border: none; color: white; border-radius: 8px; font-weight: bold; cursor: pointer; }
         
         .manage-item { background: #1e293b; padding: 12px; border-radius: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
-        .manage-actions { display: flex; gap: 8px; }
-        .edit-btn { background: #3b82f6; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 12px; }
-        .delete-btn { background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 12px; }
+        .edit-btn { background: #3b82f6; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; }
+        .delete-btn { background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; }
 
-        .nav{position:fixed; bottom:0; left:0; width:100%; background: var(--header-bg); display:flex; justify-content:space-around; padding:12px 0; border-top:1px solid #1e293b; z-index: 1000;}
+        .nav{position:fixed; bottom:0; left:0; width:100%; background: var(--header-bg); display:flex; justify-content:space-around; padding:15px 0; border-top:1px solid #1e293b; z-index: 1000;}
         .nav-item{font-size:12px; opacity:.6; cursor:pointer; color: white; text-align: center; flex: 1;}
         .nav-item.active{opacity:1; color: var(--accent);}
         .section{display:none;}
@@ -62,6 +54,7 @@
 </head>
 <body>
 
+<!-- Home Section -->
 <div id="homeSection" class="section show">
     <div class="header"><h2>Nearby Helper</h2></div>
     <div class="section-title">Emergency Services</div>
@@ -76,10 +69,14 @@
         <div class="card" onclick="openHelpers('Delivery')"><span class="icon">📦</span><h4>Delivery</h4></div>
         <div class="card" onclick="openHelpers('Others')"><span class="icon">➕</span><h4>Others</h4></div>
     </div>
-
-    <div class="contact-admin">
-        <p>তথ্য সংশোধন বা সাহায্যের জন্য যোগাযোগ করুন</p>
-        <button onclick="openTelegram()" class="support-btn">Telegram Admin</button>
+    
+    <!-- Support on Home -->
+    <div class="support-container">
+        <p>অ্যাডমিনের সাথে যোগাযোগ করুন</p>
+        <div class="support-btns">
+            <a href="https://wa.me/message/OZJGUJOUTDKRF1" target="_blank" class="btn-wa">WhatsApp</a>
+            <a href="https://t.me/personaapps" target="_blank" class="btn-tg">Telegram</a>
+        </div>
     </div>
 </div>
 
@@ -88,14 +85,14 @@
     <div id="helpersList"></div>
 </div>
 
+<!-- Portal (Registration) -->
 <div id="portalSection" class="section">
     <div class="header"><h2>Helper Portal</h2></div>
     <div class="admin-form">
-        <h4 style="margin-bottom:10px; color:var(--accent);">Create New Profile</h4>
-        <input type="text" id="regName" placeholder="Name">
-        <input type="number" id="regPhone" placeholder="Phone Number">
+        <input type="text" id="regName" placeholder="Helper Name">
+        <input type="number" id="regPhone" placeholder="Mobile Number">
         <input type="text" id="regDist" placeholder="Distance (e.g. 1.2 km)">
-        <textarea id="regDesc" placeholder="Bio..."></textarea>
+        <textarea id="regDesc" placeholder="Work Bio..."></textarea>
         <input type="file" id="regPhotoFile" accept="image/*">
         <select id="regCat">
             <option value="Plumber">Plumber</option>
@@ -109,10 +106,22 @@
     </div>
 </div>
 
+<!-- Admin Section (Management + Support) -->
 <div id="adminSection" class="section">
     <div class="header"><h2>Admin Control</h2></div>
     <div class="admin-form">
+        <h4 style="margin-bottom:15px; color:var(--accent);">Manage Profiles</h4>
         <div id="adminManageList">Loading...</div>
+    </div>
+    
+    <!-- Support Inside Admin -->
+    <div class="support-container">
+        <h4 style="color:var(--accent);">Support & Help</h4>
+        <p style="font-size:12px; margin-top:5px;">এডিট বা ডিলিট করতে সমস্যা হলে আমাদের জানান</p>
+        <div class="support-btns">
+            <a href="https://wa.me/message/OZJGUJOUTDKRF1" target="_blank" class="btn-wa">WhatsApp</a>
+            <a href="https://t.me/personaapps" target="_blank" class="btn-tg">Telegram</a>
+        </div>
     </div>
 </div>
 
@@ -120,7 +129,6 @@
     <div class="nav-item active" onclick="location.reload()">Home</div>
     <div class="nav-item" onclick="showSection('portalSection')">Portal</div>
     <div class="nav-item" onclick="accessAdmin()">Admin</div>
-    <div class="nav-item" onclick="openTelegram()">Support</div>
 </div>
 
 <script>
@@ -135,11 +143,6 @@
     };
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
-
-    // টেলিগ্রাম খোলার স্মার্ট ফাংশন
-    function openTelegram() {
-        window.location.href = "https://t.me/personaapps";
-    }
 
     function accessAdmin() {
         let pass = prompt("Admin Password:");
@@ -162,14 +165,14 @@
         const cat = document.getElementById('regCat').value;
         const dist = document.getElementById('regDist').value;
 
-        if(!name || !phone || !desc || !file) { alert("Fill all details!"); return; }
+        if(!name || !phone || !desc || !file) { alert("Please fill all details!"); return; }
 
         const reader = new FileReader();
         reader.readAsDataURL(file);
         reader.onload = () => {
             database.ref('helpers/').push({
                 name, phone, description: desc, category: cat, distance: dist, photo: reader.result
-            }).then(() => { alert("Saved!"); location.reload(); });
+            }).then(() => { alert("Saved Global!"); location.reload(); });
         };
     };
 
@@ -184,7 +187,7 @@
                 div.className = 'manage-item';
                 div.innerHTML = `
                     <div><strong>${h.name}</strong><br><small>${h.category}</small></div>
-                    <div class="manage-actions">
+                    <div style="display:flex; gap:5px;">
                         <button class="edit-btn" onclick="prepareEdit('${key}')">Edit</button>
                         <button class="delete-btn" onclick="deleteHelper('${key}')">Del</button>
                     </div>
@@ -204,7 +207,6 @@
             showSection('portalSection');
             document.getElementById('regName').value = h.name;
             document.getElementById('regPhone').value = h.phone;
-            document.getElementById('regDist').value = h.distance;
             document.getElementById('regDesc').value = h.description;
             document.getElementById('regCat').value = h.category;
             window.currentEditKey = key;
